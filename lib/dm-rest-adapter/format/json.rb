@@ -1,4 +1,5 @@
 require 'multi_json'
+require 'jsonpath'
 
 module DataMapperRest
   module Format
@@ -18,13 +19,29 @@ module DataMapperRest
       end
       
       def parse_record(json, model)
-        hash = JSON.parse(json)
+        hash = {}
+        
+        if @record_selector
+          expression = "$.#{@record_selector}"
+          hash = JsonPath.on(json, expression).first
+        else
+          hash = JSON.parse(json)
+        end
+        
         field_to_property = Hash[ model.properties(model.default_repository_name).map { |p| [ p.field, p ] } ]
         record_from_hash(hash, field_to_property)
       end
       
       def parse_collection(json, model)
-        array = JSON.parse(json)
+        array = []
+        
+        if @collection_selector
+          expression = "$.#{@collection_selector}"
+          array = JsonPath.on(json, expression).first
+        else
+          array = JSON.parse(json)
+        end
+        
         field_to_property = Hash[ model.properties(model.default_repository_name).map { |p| [ p.field, p ] } ]
         array.collect do |hash|
           record_from_hash(hash, field_to_property)

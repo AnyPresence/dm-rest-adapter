@@ -12,6 +12,7 @@ gem 'dm-serializer', DM_VERSION, SOURCE => "#{DATAMAPPER}/dm-serializer#{REPO_PO
 gem 'multi_json',  '~> 1.0.3'
 gem 'json',        '>= 1.4.6'
 gem 'json_pure',   '>= 1.4.6'
+gem 'jsonpath', '~> 0.5.1'
 
 group :development do
 

@@ -1,7 +1,7 @@
 module DataMapperRest
   module Format
     class AbstractFormat
-  	  attr_accessor :extension, :mime, :repository_name
+  	  attr_accessor :extension, :mime, :repository_name, :record_selector, :collection_selector
 
       def initialize(options = {})
         options = default_options.merge(options)
@@ -9,6 +9,8 @@ module DataMapperRest
         @extension = nil if @extension == "" # consider blank extension as not present
         @mime = options[:mime]
         @repository_name = options.fetch(:repository_name, :default)
+        @record_selector = options[:record_selector] if options[:record_selector]
+        @collection_selector = options[:collection_selector] if options[:collection_selector]
       end
 
       def default_options

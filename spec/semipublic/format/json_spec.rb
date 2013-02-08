@@ -73,6 +73,7 @@ describe DataMapperRest::Format::Json do
       @format = DataMapperRest::Format::Json.new
       @time = DateTime.new
       @json = '{"id":1,"created_at":"' + @time.to_s + '","title":"Testing","author":"Testy McTesty","comment_crazy_mapping":"Donuts"}'
+      @weather_json_instance = WUNDERGROUND_JSON_INSTANCE
     end
     
     it "loads a record from the string representation" do
@@ -83,6 +84,18 @@ describe DataMapperRest::Format::Json do
       record["author"].should == "Testy McTesty"
       record["comment_crazy_mapping"].should == "Donuts"
     end
+    
+    it "loads a record from a string represenation using a provided selector" do
+      @format.record_selector = 'forecast.txt_forecast.forecastday'
+      record = @format.parse_record(@weather_json_instance, ForecastDay)
+      record["period"].should == 0
+  		record["icon"].should == "partlycloudy"
+  		record["icon_url"].should == "http://icons-ak.wxug.com/i/c/k/partlycloudy.gif"
+  		record["title"].should == "Thursday"
+  		record["fcttext"].should == "Partly cloudy. High of 28F. Winds from the NNW at 5 to 10 mph."
+  		record["fcttext_metric"].should == "Partly cloudy. High of -2C. Winds from the NNW at 5 to 15 km/h."
+  		record["pop"].should == "0"
+    end
   end
   
   describe "#parse_collection" do
@@ -91,6 +104,8 @@ describe DataMapperRest::Format::Json do
       @time = DateTime.new
       @json = '[{"id":1,"created_at":"' + @time.to_s + '","title":"Testing","author":"Testy McTesty","comment_crazy_mapping":"Itzy Bitzy Spider"},' +
         '{"id":2,"created_at":"' + @time.to_s + '","title":"Testing 2","author":"Besty McBesty"}]'
+
+      @weather_json_collection = WUNDERGROUND_JSON_COLLECTION
     end
     
     it "loads a recordset from the string representation" do
@@ -106,6 +121,12 @@ describe DataMapperRest::Format::Json do
       collection[1]["title"].should == "Testing 2"
       collection[1]["author"].should == "Besty McBesty"
       collection[1]["comment_crazy_mapping"].should be_nil
+    end
+    
+    it "loads a recordset from a string represenation using a provided selector" do
+      @format.collection_selector = 'forecast.txt_forecast.forecastdays'
+      collection = @format.parse_collection(@weather_json_collection, ForecastDay)
+      collection.should have(8).entries
     end
   end
 end
