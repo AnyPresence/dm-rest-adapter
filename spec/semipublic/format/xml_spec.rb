@@ -74,6 +74,7 @@ describe DataMapperRest::Format::Xml do
           <author>Testy McTesty</author>
         </livre>
       XML
+      @weather_xml_instance = WUNDERGROUND_XML_INSTANCE
     end
     
     it "loads a record from the string representation" do
@@ -82,6 +83,18 @@ describe DataMapperRest::Format::Xml do
       record["created_at"].should == @time
       record["title"].should == "Testing"
       record["author"].should == "Testy McTesty"
+    end
+    
+    it "loads a record from XML using a provided selector" do
+      @format.record_selector = 'response.forecast.txt_forecast'
+      record = @format.parse_record(@weather_xml_instance, ForecastDay)
+      record["period"].should == 0
+  		record["icon"].should == "snow"
+  		record["icon_url"].should == "http://icons-ak.wxug.com/i/c/k/snow.gif"
+  		record["title"].should == "Monday"
+  		record["fcttext"].should == "Overcast with snow, then  rain in the afternoon. Fog early. High of 41F. Winds from the South at 5 to 10 mph. Chance of precipitation 90%  with accumulations up to 1 in. possible."
+  		record["fcttext_metric"].should == "Overcast with rain. Fog early. High of 5C. Winds from the South at 10 to 15 km/h. Chance of rain 90% with rainfall amounts near 6.1 mm possible."
+  		record["pop"].should == "90"
     end
   end
   
@@ -107,6 +120,8 @@ describe DataMapperRest::Format::Xml do
           </livre>
         </livres>
       XML
+      
+      @weather_xml_collection = WUNDERGROUND_XML_COLLECTION
     end
     
     it "loads a recordset from the string representation" do
@@ -120,6 +135,12 @@ describe DataMapperRest::Format::Xml do
       collection[1]["created_at"].should == @time
       collection[1]["title"].should == "Testing 2"
       collection[1]["author"].should == "Besty McBesty"
+    end
+    
+    it "loads a recordset from a string represenation using a provided selector" do
+      @format.collection_selector = 'response.forecast.txt_forecast'
+      collection = @format.parse_collection(@weather_xml_collection, ForecastDay)
+      collection.should have(8).entries
     end
   end
 end

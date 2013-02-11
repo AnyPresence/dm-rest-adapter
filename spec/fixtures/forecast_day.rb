@@ -1,5 +1,6 @@
 class ForecastDay
   include DataMapper::Resource
+  storage_names[:default] = 'forecastday'
   property :id, Serial
   property :period, Integer
   property :icon, String

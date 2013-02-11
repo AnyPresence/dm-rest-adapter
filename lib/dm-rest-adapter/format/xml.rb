@@ -14,7 +14,15 @@ module DataMapperRest
 
         field_to_property = Hash[ model.properties(repository_name).map { |p| [ p.field, p ] } ]
         element_name = element_name(model)
-        doc.elements.collect("/#{DataMapper::Inflector.pluralize(resource_name(model))}/#{element_name}") do |entity_element|
+        
+        selector = "/#{DataMapper::Inflector.pluralize(resource_name(model))}/#{element_name}"
+        
+        if @collection_selector
+          selector = "/#{@collection_selector.gsub('.','/')}#{selector}"
+          puts "\nUsing collection selector of #{selector}"
+        end
+        
+        doc.elements.collect(selector) do |entity_element|
           record_from_rexml(entity_element, field_to_property)
         end
       end
@@ -22,9 +30,15 @@ module DataMapperRest
       def parse_record(xml, model)
         doc = REXML::Document::new(xml)
 
-        element_name = element_name(model)
-
-        unless entity_element = REXML::XPath.first(doc, "/#{element_name}")
+        selector = "/#{element_name(model)}"
+        
+        if @record_selector
+          selector = "/#{@record_selector.gsub('.','/')}#{selector}"
+          puts "\nUsing selector of #{selector}"
+          element_name = selector
+        end
+        
+        unless entity_element = REXML::XPath.first(doc, selector)
           raise "No root element matching #{element_name} in xml"
         end
 
