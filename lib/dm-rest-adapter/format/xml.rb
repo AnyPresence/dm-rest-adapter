@@ -13,14 +13,8 @@ module DataMapperRest
         doc = REXML::Document::new(xml)
 
         field_to_property = Hash[ model.properties(repository_name).map { |p| [ p.field, p ] } ]
-        element_name = element_name(model)
         
-        selector = "/#{DataMapper::Inflector.pluralize(resource_name(model))}/#{element_name}"
-        
-        if @collection_selector
-          selector = "/#{@collection_selector.gsub('.','/')}#{selector}"
-          puts "\nUsing collection selector of #{selector}"
-        end
+        selector = collection_selector_expression(model)        
         
         doc.elements.collect(selector) do |entity_element|
           record_from_rexml(entity_element, field_to_property)
@@ -30,19 +24,13 @@ module DataMapperRest
       def parse_record(xml, model)
         doc = REXML::Document::new(xml)
 
-        selector = "/#{element_name(model)}"
-        
-        if @record_selector
-          selector = "/#{@record_selector.gsub('.','/')}#{selector}"
-          puts "\nUsing selector of #{selector}"
-          element_name = selector
-        end
+        selector = record_selector_expression(model)
         
         unless entity_element = REXML::XPath.first(doc, selector)
           raise "No root element matching #{element_name} in xml"
         end
 
-        field_to_property = Hash[ model.properties(model.default_repository_name).map { |p| [ p.field, p ] } ]
+        field_to_property = Hash[ properties(model).map { |p| [ p.field, p ] } ]
         record_from_rexml(entity_element, field_to_property)
       end
 
@@ -60,8 +48,24 @@ module DataMapperRest
         record
       end
 
-      def element_name(model)
-        DataMapper::Inflector.singularize(model.storage_name(model.default_repository_name))
+      def record_selector_expression(model)
+        selector = "/#{element_name(model)}"
+        
+        if @record_selector
+          selector = "/#{@record_selector.gsub('.','/')}#{selector}"
+        end
+        
+        selector
+      end
+      
+      def collection_selector_expression(model)
+        selector = "/#{element_name_plural(model)}/#{element_name(model)}"
+        
+        if @collection_selector
+          selector = "/#{@collection_selector.gsub('.','/')}#{selector}"
+        end
+        
+        selector
       end
     end
   end

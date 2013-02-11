@@ -53,6 +53,18 @@ module DataMapperRest
         end
       end
       
+      def element_name(model)
+        DataMapper::Inflector.singularize(resource_name(model))
+      end
+      
+      def element_name_plural(model)
+        DataMapper::Inflector.pluralize(resource_name(model))
+      end
+      
+      def properties(model)
+        model.properties(model.default_repository_name)
+      end
+      
       def string_representation(resource)
         raise NotImplementedError,
           "#{self.class}#string_representation not implemented"
@@ -66,6 +78,16 @@ module DataMapperRest
       def parse_record(body, model)
         raise NotImplementedError,
           "#{self.class}#parse_record not implemented"
+      end
+      
+      def record_selector_expression(model)
+        raise NotImplementedError,
+          "#{self.class}#record_selector_expression not implemented"
+      end
+      
+      def collection_selector_expression(model)
+        raise NotImplementedError,
+          "#{self.class}#collection_selector_expression not implemented"
       end
     end
   end

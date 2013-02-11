@@ -124,7 +124,7 @@ describe DataMapperRest::Format::Json do
     end
     
     it "loads a recordset from a string represenation using a provided selector" do
-      @format.collection_selector = 'forecast.txt_forecast.forecastdays'
+      @format.collection_selector = 'forecast.txt_forecast'
       collection = @format.parse_collection(@weather_json_collection, ForecastDay)
       collection.should have(8).entries
     end

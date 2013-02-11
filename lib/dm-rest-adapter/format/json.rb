@@ -22,13 +22,12 @@ module DataMapperRest
         hash = {}
         
         if @record_selector
-          expression = "$.#{@record_selector}"
-          hash = JsonPath.on(json, expression).first
+          hash = JsonPath.on(json, record_selector_expression(model)).first
         else
           hash = JSON.parse(json)
         end
         
-        field_to_property = Hash[ model.properties(model.default_repository_name).map { |p| [ p.field, p ] } ]
+        field_to_property = Hash[ properties(model).map { |p| [ p.field, p ] } ]
         record_from_hash(hash, field_to_property)
       end
       
@@ -36,13 +35,12 @@ module DataMapperRest
         array = []
         
         if @collection_selector
-          expression = "$.#{@collection_selector}"
-          array = JsonPath.on(json, expression).first
+          array = JsonPath.on(json, collection_selector_expression(model)).first
         else
           array = JSON.parse(json)
         end
         
-        field_to_property = Hash[ model.properties(model.default_repository_name).map { |p| [ p.field, p ] } ]
+        field_to_property = Hash[ properties(model).map { |p| [ p.field, p ] } ]
         array.collect do |hash|
           record_from_hash(hash, field_to_property)
         end
@@ -59,6 +57,15 @@ module DataMapperRest
         
         record
       end
+      
+      def record_selector_expression(model)
+        "$.#{@record_selector}"
+      end
+      
+      def collection_selector_expression(model)
+        "$.#{@collection_selector}.#{element_name_plural(model)}"
+      end
+      
     end
   end
 end
