@@ -160,6 +160,10 @@ module DataMapperRest
         @format.extension = nil
         DataMapper.logger.debug("Will not use format extension in requested URLs")
       end
+      
+      DataMapper.logger.debug("Will use record selector #{@options[:record_selector]}") if @options[:record_selector]
+      DataMapper.logger.debug("Will use collection selector #{@options[:collection_selector]}") if @options[:collection_selector]
+            
       DataMapper.logger.debug("Initializing RestClient with #{normalized_uri}")
       @rest_client = RestClient::Resource.new(normalized_uri)
       RestClient.log = STDOUT if DataMapper.logger.level == 0
