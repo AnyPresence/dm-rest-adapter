@@ -35,9 +35,8 @@ module DataMapperRest
         array = []
         
         if @collection_selector
-          puts "using #{collection_selector_expression(model)}"
           array = JsonPath.on(json, collection_selector_expression(model)).first
-          puts "Array was #{array.inspect}"
+          raise "Collection selector returned no results." if array.nil?
         else
           array = JSON.parse(json)
         end
