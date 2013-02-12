@@ -473,9 +473,6 @@ WUNDERGROUND_JSON_INSTANCE =
 		,
 	"forecast":{
 		"txt_forecast": {
-		"date":"10:00 PM EST",
-		"forecastday":
-		{
 		"period":0,
 		"icon":"partlycloudy",
 		"icon_url":"http://icons-ak.wxug.com/i/c/k/partlycloudy.gif",
@@ -483,7 +480,6 @@ WUNDERGROUND_JSON_INSTANCE =
 		"fcttext":"Partly cloudy. High of 28F. Winds from the NNW at 5 to 10 mph.",
 		"fcttext_metric":"Partly cloudy. High of -2C. Winds from the NNW at 5 to 15 km/h.",
 		"pop":"0"
-		}
 	  }
   }
 }
@@ -501,9 +497,7 @@ WUNDERGROUND_JSON_COLLECTION =
 	}
 		,
 	"forecast":{
-		"txt_forecast": {
-		"date":"10:00 PM EST",
-		"forecastdays": [
+		"txt_forecast": [
 		{
 		"period":0,
 		"icon":"partlycloudy",
@@ -583,8 +577,7 @@ WUNDERGROUND_JSON_COLLECTION =
 		"fcttext_metric":"Clear. Low of -16C. Winds from the West at 10 to 15 km/h.",
 		"pop":"0"
 		}
-		]
-		},
+		],
 		"simpleforecast": {
 		"forecastday": [
 		{"date":{

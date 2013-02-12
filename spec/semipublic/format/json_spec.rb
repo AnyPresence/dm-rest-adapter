@@ -86,7 +86,7 @@ describe DataMapperRest::Format::Json do
     end
     
     it "loads a record from a string represenation using a provided selector" do
-      @format.record_selector = 'forecast.txt_forecast.forecastday'
+      @format.record_selector = 'forecast.txt_forecast'
       record = @format.parse_record(@weather_json_instance, ForecastDay)
       record["period"].should == 0
   		record["icon"].should == "partlycloudy"
@@ -122,7 +122,7 @@ describe DataMapperRest::Format::Json do
     end
     
     it "loads a recordset from a string represenation using a provided selector" do
-      @format.collection_selector = 'forecast.txt_forecast.forecastdays'
+      @format.collection_selector = 'forecast.txt_forecast'
       collection = @format.parse_collection(WUNDERGROUND_JSON_COLLECTION, ForecastDay)
       collection.should have(8).entries
     end
