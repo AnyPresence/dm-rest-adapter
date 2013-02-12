@@ -35,7 +35,9 @@ module DataMapperRest
         array = []
         
         if @collection_selector
+          puts "using #{collection_selector_expression(model)}"
           array = JsonPath.on(json, collection_selector_expression(model)).first
+          puts "Array was #{array.inspect}"
         else
           array = JSON.parse(json)
         end
@@ -63,7 +65,7 @@ module DataMapperRest
       end
       
       def collection_selector_expression(model)
-        "$.#{@collection_selector}.#{element_name_plural(model)}"
+        "$.#{@collection_selector}"
       end
       
     end

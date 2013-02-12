@@ -104,8 +104,6 @@ describe DataMapperRest::Format::Json do
       @time = DateTime.new
       @json = '[{"id":1,"created_at":"' + @time.to_s + '","title":"Testing","author":"Testy McTesty","comment_crazy_mapping":"Itzy Bitzy Spider"},' +
         '{"id":2,"created_at":"' + @time.to_s + '","title":"Testing 2","author":"Besty McBesty"}]'
-
-      @weather_json_collection = WUNDERGROUND_JSON_COLLECTION
     end
     
     it "loads a recordset from the string representation" do
@@ -124,9 +122,16 @@ describe DataMapperRest::Format::Json do
     end
     
     it "loads a recordset from a string represenation using a provided selector" do
-      @format.collection_selector = 'forecast.txt_forecast'
-      collection = @format.parse_collection(@weather_json_collection, ForecastDay)
+      @format.collection_selector = 'forecast.txt_forecast.forecastdays'
+      collection = @format.parse_collection(WUNDERGROUND_JSON_COLLECTION, ForecastDay)
       collection.should have(8).entries
+    end
+    
+    it "loads a recordset from a flock of tweets using a provided selector" do
+      @format.collection_selector = 'results'
+      collection = @format.parse_collection(TWITTER_JSON_COLLECTION, Tweet)
+      collection.should have(15).entries
+      collection[0]["id"].should == 299950023326703616
     end
   end
 end
