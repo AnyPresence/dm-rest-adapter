@@ -133,5 +133,55 @@ describe DataMapperRest::Format::Json do
       collection.should have(15).entries
       collection[0]["id"].should == 299950023326703616
     end
+    
+    it "loads a recordset from a string using a selector that contains a dash and an underscore" do
+      data = <<-JSON
+      {"response": {
+      	  "silly_forecast": {
+      	    "txt-forecast": [
+      		  {
+        		    "period": 0,
+        		    "icon": "snow",
+        		    "icon_url": "http://icons-ak.wxug.com/i/c/k/snow.gif",
+        		    "title": "Monday",
+        		    "fcttext": "Overcast with snow, then  rain in the afternoon. Fog early. High of 41F. Winds from the South at 5 to 10 mph. Chance of precipitation 90%  with accumulations up to 1 in. possible.",
+        		    "fcttext_metric": "Overcast with rain. Fog early. High of 5C. Winds from the South at 10 to 15 km/h. Chance of rain 90% with rainfall amounts near 6.1 mm possible.",
+        		    "pop": "90"
+      		  }
+    		  ]
+  		  }
+		  }
+	  }
+    JSON
+      
+      @format.collection_selector = "response.silly_forecast.txt-forecast"
+      collection = @format.parse_collection(data, ForecastDay)
+      collection.should have(1).entries
+      record = collection[0]
+      record["period"].should == 0
+  		record["icon"].should == "snow"
+  		record["icon_url"].should == "http://icons-ak.wxug.com/i/c/k/snow.gif"
+  		record["title"].should == "Monday"
+  		record["fcttext"].should == "Overcast with snow, then  rain in the afternoon. Fog early. High of 41F. Winds from the South at 5 to 10 mph. Chance of precipitation 90%  with accumulations up to 1 in. possible."
+  		record["fcttext_metric"].should == "Overcast with rain. Fog early. High of 5C. Winds from the South at 10 to 15 km/h. Chance of rain 90% with rainfall amounts near 6.1 mm possible."
+  		record["pop"].should == "90"
+    end
+    
+    it "loads an emtpy recordset from a string using a selector that contains a dash and an underscore" do
+      data = <<-JSON
+      {"response": {
+      	  "silly_forecast": {
+      	    "txt-forecast": {
+      	      "some-other-crazy_dash": []
+      	    }
+  	      }
+	      }
+      }
+      JSON
+      @format.collection_selector = "response.silly_forecast.txt-forecast.some-other-crazy_dash"
+      collection = @format.parse_collection(data, ForecastDay)
+      collection.should_not be_nil
+      collection.should have(0).entries
+    end
   end
 end

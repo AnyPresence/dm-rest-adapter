@@ -36,7 +36,7 @@ module DataMapperRest
         
         if @collection_selector
           array = JsonPath.on(json, collection_selector_expression(model)).first
-          raise "Collection selector returned no results." if array.nil?
+          raise "Collection selector resulted in an error." if array.nil?
         else
           array = JSON.parse(json)
         end
@@ -60,13 +60,18 @@ module DataMapperRest
       end
       
       def record_selector_expression(model)
-        "$.#{@record_selector}"
+        "$.#{transform_selector_expression(@record_selector)}"
       end
       
       def collection_selector_expression(model)
-        "$.#{@collection_selector}"
+        "$.#{transform_selector_expression(@collection_selector)}"
       end
       
+      def transform_selector_expression(expression)
+        expression.gsub(/(\w+(-\w+)+)/) do |match| 
+          "['#{match}']"
+        end
+      end
     end
   end
 end

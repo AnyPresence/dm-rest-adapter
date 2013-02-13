@@ -142,5 +142,45 @@ describe DataMapperRest::Format::Xml do
       collection = @format.parse_collection(@weather_xml_collection, ForecastDay)
       collection.should have(8).entries
     end
+    
+    it "loads a recordset from a string using a selector that contains a dash and an underscore" do
+      data = <<-XML
+      <response>
+      	<version>0.1</version>
+      	<termsofService>http://www.wunderground.com/weather/api/d/terms.html</termsofService>
+      	<features>
+      		<feature>forecast</feature>
+      	</features>
+      	<silly_forecast>
+      		<txt-forecast>
+      		<date>10:00 AM EST</date>
+      		<forecastdays>
+      		 <forecastday>
+      		  <period>0</period>
+        		<icon>snow</icon>
+        		<icon_url>http://icons-ak.wxug.com/i/c/k/snow.gif</icon_url>
+        		<title>Monday</title>
+        		<fcttext><![CDATA[Overcast with snow, then  rain in the afternoon. Fog early. High of 41F. Winds from the South at 5 to 10 mph. Chance of precipitation 90%  with accumulations up to 1 in. possible.]]></fcttext>
+        		<fcttext_metric><![CDATA[Overcast with rain. Fog early. High of 5C. Winds from the South at 10 to 15 km/h. Chance of rain 90% with rainfall amounts near 6.1 mm possible.]]></fcttext_metric>
+        		<pop>90</pop>
+        	 </forecastday>
+      		</forecastdays>
+      		</txt-forecast>
+      	</silly_forecast>
+      </response>
+      XML
+      
+      @format.collection_selector = 'response.silly_forecast.txt-forecast'
+      collection = @format.parse_collection(data, ForecastDay)
+      collection.should have(1).entries
+      record = collection[0]
+      record["period"].should == 0
+  		record["icon"].should == "snow"
+  		record["icon_url"].should == "http://icons-ak.wxug.com/i/c/k/snow.gif"
+  		record["title"].should == "Monday"
+  		record["fcttext"].should == "Overcast with snow, then  rain in the afternoon. Fog early. High of 41F. Winds from the South at 5 to 10 mph. Chance of precipitation 90%  with accumulations up to 1 in. possible."
+  		record["fcttext_metric"].should == "Overcast with rain. Fog early. High of 5C. Winds from the South at 10 to 15 km/h. Chance of rain 90% with rainfall amounts near 6.1 mm possible."
+  		record["pop"].should == "90"
+    end
   end
 end
