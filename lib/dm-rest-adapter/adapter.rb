@@ -9,7 +9,7 @@ module DataMapperRest
         model = resource.model
 
         path_items = extract_parent_items_from_resource(resource)
-        path_items << { :model => model.storage_name(model.default_repository_name) }
+        path_items << { :model => model.respond_to?(:storage_name) ? model.storage_name : model }
 
         path = @format.resource_path(*path_items)
         
