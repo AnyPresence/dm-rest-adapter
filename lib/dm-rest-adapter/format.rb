@@ -18,14 +18,15 @@ module DataMapperRest
       end
 
       def resource_name(model)
-        model.storage_name(model.default_repository_name) 
+        model.respond_to?(:storage_name) ? model.storage_name(repository_name) : model
       end
 
       def resource_path(*path_fragments)
         path = path_fragments.reduce("") do |memo, fragment|
           model = fragment[:model]
           key   = fragment[:key]
-          memo << "#{resource_name(model)}/"
+          name = resource_name(model)
+          memo << "#{name}/" if name
           memo << "#{key}/" if key
           memo
         end.chomp("/")

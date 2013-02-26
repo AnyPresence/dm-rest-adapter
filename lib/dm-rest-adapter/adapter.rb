@@ -3,13 +3,13 @@ module DataMapperRest
 
   class Adapter < DataMapper::Adapters::AbstractAdapter
     attr_accessor :rest_client, :format
-    
+        
     def create(resources)
       resources.each do |resource|
         model = resource.model
 
         path_items = extract_parent_items_from_resource(resource)
-        path_items << { :model => model.respond_to?(:storage_name) ? model.storage_name : model }
+        path_items << { :model => mapped_name(model) }
 
         path = @format.resource_path(*path_items)
         
@@ -46,7 +46,7 @@ module DataMapperRest
       
       if id = extract_id_from_query(query)
         begin
-          path_items << { :model => model, :key => id }
+          path_items << { :model => mapped_name(model) , :key => id }
           path = @format.resource_path(*path_items)
           
           DataMapper.logger.debug("About to GET using #{path}")
@@ -61,7 +61,7 @@ module DataMapperRest
           records = []
         end
       else
-        path_items << { :model => model }
+        path_items << { :model => mapped_name(model)  }
         query_options = { :accept => @format.mime }
         params = extract_params_from_query(query)
         query_options[:params] = params unless params.empty?
@@ -86,7 +86,7 @@ module DataMapperRest
         id    = key.get(resource).first
         
         path_items = extract_parent_items_from_resource(resource)
-        path_items << { :model => model, :key => id }
+        path_items << { :model => mapped_name(model) , :key => id }
 
         dirty_attributes.each { |p, v| p.set!(resource, v) }
 
@@ -106,7 +106,7 @@ module DataMapperRest
         id    = key.get(resource).first
         
         path_items = extract_parent_items_from_resource(resource)
-        path_items << { :model => model, :key => id }
+        path_items << { :model => mapped_name(model) , :key => id }
         
         response = @rest_client[@format.resource_path(*path_items)].delete(
           :accept => @format.mime
@@ -118,6 +118,10 @@ module DataMapperRest
 
     private
 
+    def mapped_name(model)
+      model.respond_to?(:storage_name) ? model.storage_name(model.repository_name) : model
+    end
+    
     def initialize(*)
       super
       
