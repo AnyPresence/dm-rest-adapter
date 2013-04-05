@@ -40,15 +40,19 @@ module DataMapperRest
         model = resource.model
         model.properties + model.relationships.reject{ |r| r.source_key == model.key }.collect{ |r| r.source_key }.flatten
       end
-      
+                  
       def update_attributes(resource, body)
         return if DataMapper::Ext.blank?(body)
-
+        fields = {}
         model      = resource.model
         properties = model.properties(repository_name)
 
+        properties.each do |prop| 
+          fields[prop.field.to_sym] = prop.name.to_sym 
+        end
+        
         parse_record(body, model).each do |key, value|
-          if property = properties[key.to_sym]
+          if property = properties[fields[key.to_sym]]
             property.set!(resource, value)
           end
         end
