@@ -12,7 +12,18 @@ module DataMapperRest
         model = resource.model
         
         hash = properties_to_serialize(resource).reduce({}) do |h, property|
-          h.merge(property.field.to_sym => property.dump(property.get(resource)))
+          key = property.field.to_sym
+          dumped_value = ''
+          value = property.get(resource)
+          
+          if(hash_or_array? value)
+            dumped_value = MultiJson.dump(value)
+            dumped_value = MultiJson.decode(dumped_value) #Dump also encodes is why, and we don't want to double encode.
+          else
+            dumped_value = property.dump(value)
+          end
+          
+          h.merge(key => dumped_value)
         end
         
         MultiJson.encode(hash)
@@ -71,6 +82,10 @@ module DataMapperRest
         expression.gsub(/(\w+(-\w+)+)/) do |match| 
           "['#{match}']"
         end
+      end
+      
+      def hash_or_array?(value)
+        value.kind_of?(::Hash) || value.kind_of?(::Array)
       end
     end
   end
