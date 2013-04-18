@@ -15,7 +15,7 @@ describe DataMapperRest::Format::Json do
     context "with a simple resource" do
       before(:each) do
         @json = '{"id":1,"created_at":"' + @time.to_s + '","title":"Testing","author":"Testy McTesty","comment_crazy_mapping":"Why I write such good books?"}'
-        @msg_json = '{"id":42,"conversation_id":null,"company_id":"28048220-1419-45AC-874B-80B26CFEBA57","conv_input":{"timestamp":"2013-03-25T21:08:01.123Z","geo_lat":null,"geo_long":null,"geo_err":null},"exec_actions":"CAO","input_region":"VHS","message_region":"test","server_id":33,"state":"VA","state_data":null,"titlebar_region":"Snickers"}'
+        @msg_json = '{"id":42,"conversation_id":null,"company_id":"28048220-1419-45AC-874B-80B26CFEBA57","conv_input":{"timestamp":"2013-03-25T21:08:01.123Z","geo_lat":null,"geo_long":null,"geo_err":null},"exec_actions":"CAO","input_region":"VHS","message_region":"test","server_id":33,"state":"VA","state_data":["humpty","dumpty"],"titlebar_region":"Snickers"}'
       end
       
       it "returns a JSON string representing the resource" do
@@ -40,7 +40,7 @@ describe DataMapperRest::Format::Json do
           :message_region => "test",
           :server_id => 33,
           :state => "VA",
-          :state_data => nil,
+          :state_data => ["humpty","dumpty"],
           :titlebar_region => "Snickers"
         )
         message_json = @format.string_representation(message)
