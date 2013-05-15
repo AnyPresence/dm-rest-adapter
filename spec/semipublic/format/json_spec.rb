@@ -185,7 +185,7 @@ describe DataMapperRest::Format::Json do
   		record["pop"].should == "90"
     end
     
-    it "loads an emtpy recordset from a string using a selector that contains a dash and an underscore" do
+    it "loads an empty recordset from a string using a selector that contains a dash and an underscore" do
       data = <<-JSON
       {"response": {
       	  "silly_forecast": {
@@ -200,6 +200,14 @@ describe DataMapperRest::Format::Json do
       collection = @format.parse_collection(data, ForecastDay)
       collection.should_not be_nil
       collection.should have(0).entries
+    end
+    
+    it "loads a recordset from a crazy JSON string using the provided selector" do
+      data = GANNETT_ARTICLES
+      @format.collection_selector = "stories.[-0].xml.[0].article"
+      collection = @format.parse_collection(data, Article)
+      collection.should_not be_nil
+      collection.should have(15).entries
     end
   end
 end

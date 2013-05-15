@@ -122,6 +122,7 @@ describe DataMapperRest::Format::Xml do
       XML
       
       @weather_xml_collection = WUNDERGROUND_XML_COLLECTION
+
     end
     
     it "loads a recordset from the string representation" do
@@ -141,6 +142,12 @@ describe DataMapperRest::Format::Xml do
       @format.collection_selector = 'response.forecast.txt_forecast'
       collection = @format.parse_collection(@weather_xml_collection, ForecastDay)
       collection.should have(8).entries
+    end
+    
+    it "loads a recordset from a crazy string representation using provided selector" do
+      @format.collection_selector = 'Notices.Notice'
+      collection = @format.parse_collection(NOTICES_XML_COLLECTION, Comment)
+      collection.should have(13).entries
     end
     
     it "loads a recordset from a string using a selector that contains a dash and an underscore" do

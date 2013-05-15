@@ -13,9 +13,9 @@ module DataMapperRest
         doc = REXML::Document::new(xml)
 
         field_to_property = Hash[ model.properties(repository_name).map { |p| [ p.field, p ] } ]
-        
+
         selector = collection_selector_expression(model)        
-        
+
         doc.elements.collect(selector) do |entity_element|
           record_from_rexml(entity_element, field_to_property)
         end
