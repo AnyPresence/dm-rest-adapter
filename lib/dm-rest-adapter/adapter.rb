@@ -125,6 +125,8 @@ module DataMapperRest
     def initialize(*)
       super
       
+      initialize_logger
+      
       DataMapper.logger.debug("Initializing REST adapter with #{@options.inspect}")
       
       raise ArgumentError, "Missing :format in @options" unless @options[:format]
@@ -308,5 +310,15 @@ module DataMapperRest
       end
       orders
     end
+    
+    def initialize_logger
+      level = 'error'
+      
+      if @options[:logging_level] && %w[ off fatal error warn info debug ].include?(@options[:logging_level].downcase)
+        level = @options[:logging_level].downcase
+      end
+      DataMapper::Logger.new(STDOUT,level)
+    end
+    
   end
 end

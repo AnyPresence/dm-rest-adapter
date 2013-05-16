@@ -11,7 +11,8 @@ describe DataMapper::Adapters::RestAdapter do
       :password => "secret",
       :format   => @format,
       :limit_param_name => 'unlimited',
-      :offset_param_name => 'nuffsaid'
+      :offset_param_name => 'nuffsaid',
+      :logging_level => 'fatal'
     }])
     @adapter.rest_client = double("rest_client")
 
