@@ -17,7 +17,7 @@ module DataMapperRest
         
         response = @rest_client[path].post(
           @format.string_representation(resource),
-          :content_type => @format.mime, :accept => @format.mime
+          create_headers(:content_type => @format.mime)
         ) do |response, request, result, &block|
           
           DataMapper.logger.debug("Response to POST was #{response.inspect}")
@@ -51,7 +51,7 @@ module DataMapperRest
           
           DataMapper.logger.debug("About to GET using #{path}")
           
-          response = @rest_client[path].get(:accept => @format.mime)
+          response = @rest_client[path].get(create_headers())
           
           DataMapper.logger.debug("Response to GET was #{response.inspect}")
           
@@ -62,7 +62,7 @@ module DataMapperRest
         end
       else
         path_items << { :model => mapped_name(model)  }
-        query_options = { :accept => @format.mime }
+        query_options = create_headers()
         params = extract_params_from_query(query)
         query_options[:params] = params unless params.empty?
         
@@ -92,7 +92,7 @@ module DataMapperRest
 
         response = @rest_client[@format.resource_path(*path_items)].put(
           @format.string_representation(resource),
-          :content_type => @format.mime, :accept => @format.mime
+          create_headers(:content_type => @format.mime)
         )
 
         @format.update_attributes(resource, response.body)
@@ -109,7 +109,7 @@ module DataMapperRest
         path_items << { :model => mapped_name(model) , :key => id }
         
         response = @rest_client[@format.resource_path(*path_items)].delete(
-          :accept => @format.mime
+          create_headers()
         )
 
         (200..207).include?(response.code)
@@ -118,6 +118,18 @@ module DataMapperRest
 
     private
 
+    # Returns a hash of HTTP headers with a default of :accept => mime and configured extra headers plus any non nil pairs passed
+    def create_headers(custom_headers={})
+      
+      headers = {:accept => @format.mime}.merge!(custom_headers).delete_if{|key, value| key.nil? or value.nil? }
+      
+      unless @extra_headers.nil?
+        headers.merge!(@extra_headers)
+      end
+      
+      headers
+    end
+    
     def mapped_name(model)
       model.respond_to?(:storage_name) ? model.storage_name(model.repository_name) : model
     end
@@ -165,6 +177,11 @@ module DataMapperRest
       if @options[:disable_format_extension_in_request_url]
         @format.extension = nil
         DataMapper.logger.debug("Will not use format extension in requested URLs")
+      end
+      
+      if @options[:extra_http_headers]
+        @extra_headers = @options[:extra_http_headers]
+        DataMapper.logger.debug("Will use extra HTTP headers #{@extra_headers.inspect}")
       end
       
       DataMapper.logger.debug("Will use record selector #{@options[:record_selector]}") if @options[:record_selector]
