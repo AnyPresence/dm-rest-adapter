@@ -49,7 +49,8 @@ module DataMapperRest
           array = JsonPath.on(json, collection_selector_expression(model)).first
           raise "Collection selector resulted in an error." if array.nil?
         else
-          array = JSON.parse(json)
+          parsed_collection = JSON.parse(json)
+          array = parsed_collection.kind_of?(Array) ? parsed_collection : [parsed_collection]
         end
         
         field_to_property = Hash[ properties(model).map { |p| [ p.field, p ] } ]
