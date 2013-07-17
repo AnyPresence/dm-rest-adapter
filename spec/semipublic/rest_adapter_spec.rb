@@ -207,7 +207,7 @@ describe DataMapper::Adapters::RestAdapter do
       end
 
       it "should delegate to the Format to parse the response" do
-        @response.should_receive(:body) { "<<a collection>>" }
+        @response.should_receive(:body).twice { "<<a collection>>" }
         @format.should_receive(:parse_collection).with("<<a collection>>", Book).and_return(@resources)
         stub_mocks!
         @adapter.read(@query).should eql @resources
@@ -317,7 +317,7 @@ describe DataMapper::Adapters::RestAdapter do
       end
 
       it "should delegate to the Format to parse the response" do
-        @response.should_receive(:body) { "<<a collection>>" }
+        @response.should_receive(:body).twice { "<<a collection>>" }
         @format.should_receive(:parse_collection).with("<<a collection>>", Book).and_return(@records)
         stub_mocks!
         @adapter.read(@query2).should eql @records
@@ -377,7 +377,7 @@ describe DataMapper::Adapters::RestAdapter do
     end
 
     it "should ask the format to update the resource with the response" do
-      @response.should_receive(:body) { "<<a useless format>>" }
+      @response.should_receive(:body).twice { "<<a useless format>>" }
       @format.should_receive(:update_attributes).with(@resource, "<<a useless format>>")
       stub_mocks!
       @adapter.update({ Book.properties[:author] => "John Doe" }, @resources)

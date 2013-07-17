@@ -72,7 +72,7 @@ module DataMapperRest
         
         response = @rest_client[path].get(query_options)
         
-        DataMapper.logger.debug("Response to GET was #{response.inspect}")
+        DataMapper.logger.debug("Response to GET was #{response.body}")
         records = @format.parse_collection(response.body, model)
       end
 
@@ -94,7 +94,9 @@ module DataMapperRest
           @format.string_representation(resource),
           create_headers(:content_type => @format.mime)
         )
-
+        
+        DataMapper.logger.debug("Response to PUT was #{response.body}")
+        
         @format.update_attributes(resource, response.body)
       end.size
     end
@@ -111,7 +113,9 @@ module DataMapperRest
         response = @rest_client[@format.resource_path(*path_items)].delete(
           create_headers()
         )
-
+        
+        DataMapper.logger.debug("Response to DELETE was #{response.body}")
+        
         (200..207).include?(response.code)
       end.size
     end
