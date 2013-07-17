@@ -180,7 +180,10 @@ module DataMapperRest
       end
       
       if @options[:extra_http_headers]
-        @extra_headers = @options[:extra_http_headers]
+        @extra_headers = Hash.new 
+        @options[:extra_http_headers].each do |key, value| 
+          @extra_headers[key.to_sym] = value
+        end
         DataMapper.logger.debug("Will use extra HTTP headers #{@extra_headers.inspect}")
       end
       

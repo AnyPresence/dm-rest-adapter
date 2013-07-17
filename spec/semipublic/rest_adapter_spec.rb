@@ -13,7 +13,7 @@ describe DataMapper::Adapters::RestAdapter do
       :limit_param_name => 'unlimited',
       :offset_param_name => 'nuffsaid',
       :logging_level => 'fatal',
-      :extra_http_headers => {:api_key => "HumptyDumpty"}
+      :extra_http_headers => {:api_key => "HumptyDumpty", :content_type => "user/provided"}
     }])
     @adapter.rest_client = double("rest_client")
 
@@ -158,7 +158,7 @@ describe DataMapper::Adapters::RestAdapter do
         @format.stub(:string_representation) { "<<a useless format>>" }
         @adapter.rest_client.should_receive(:post).with(
           "<<a useless format>>",
-          { :content_type => "application/mock", :accept => "application/mock", :api_key => "HumptyDumpty" }
+          { :accept=>"application/mock", :content_type=>"user/provided", :api_key=>"HumptyDumpty" }
         ).and_return(@response)
         stub_mocks!
         @adapter.create(@resources)
@@ -200,7 +200,7 @@ describe DataMapper::Adapters::RestAdapter do
 
       it "should use GET" do
         @adapter.rest_client.should_receive(:get).with(
-          {:accept=>"application/mock", :api_key => "HumptyDumpty", :params=>{:order=>{:id=>:asc}}}
+          {:accept=>"application/mock", :api_key=>"HumptyDumpty", :content_type=>"user/provided", :params=>{:order=>{:id=>:asc}}}
         ).and_return(@response)
         stub_mocks!
         @adapter.read(@query)
@@ -246,7 +246,9 @@ describe DataMapper::Adapters::RestAdapter do
       end
 
       it "should use GET" do
-        @adapter.rest_client.should_receive(:get).with({ :accept => "application/mock", :api_key => "HumptyDumpty" }).and_return(@response)
+        @adapter.rest_client.should_receive(:get).with(
+          {:accept=>"application/mock", :api_key=>"HumptyDumpty", :content_type=>"user/provided"}
+          ).and_return(@response)
         stub_mocks!
         @adapter.read(@query)
       end
@@ -302,7 +304,7 @@ describe DataMapper::Adapters::RestAdapter do
       it "should use GET with the conditions appended as params" do
         @adapter.rest_client.should_receive(:get).with(
             {
-            :accept=>"application/mock", :api_key => "HumptyDumpty",
+            :accept=>"application/mock", :api_key=>"HumptyDumpty", :content_type=>"user/provided",
             :params=>{
               :order=>{:title=>:asc, :author=>:desc, :comment_crazy_mapping=>:asc}, 
               :author=>"Dan Kubb", 
@@ -357,7 +359,7 @@ describe DataMapper::Adapters::RestAdapter do
       @format.stub(:string_representation) { "<<a useless format>>" }
       @adapter.rest_client.should_receive(:put).with(
         "<<a useless format>>",
-        { :content_type => "application/mock", :accept => "application/mock", :api_key => "HumptyDumpty" }
+        { :accept=>"application/mock", :content_type=>"user/provided", :api_key=>"HumptyDumpty" }
       ).and_return(@response)
       stub_mocks!
       @adapter.update({ Book.properties[:author] => "John Doe" }, @resources)
@@ -407,7 +409,9 @@ describe DataMapper::Adapters::RestAdapter do
     end
 
     it "should DELETE the resource from the path" do
-      @adapter.rest_client.should_receive(:delete).with({ :accept => "application/mock", :api_key=>"HumptyDumpty" }).and_return(@response)
+      @adapter.rest_client.should_receive(:delete).with(
+      { :accept => "application/mock", :api_key=>"HumptyDumpty", :content_type=>"user/provided" }
+      ).and_return(@response)
       stub_mocks!
       @adapter.delete(@resources)
     end
@@ -432,7 +436,8 @@ describe DataMapper::Adapters::RestAdapter do
       it "should fetch the resource with the parent ID and an overridden limit and offset with order by clauses" do
         @format.should_receive(:resource_path).with({ :model => "book_covers" })
         @adapter.rest_client.should_receive(:get).with(
-          {:accept=>"application/mock", :api_key=>"HumptyDumpty", :params=>{:unlimited=>1, :nuffsaid=>0, :order=>{:id=>:asc}, :book_id=>1}}
+          {:accept=>"application/mock", :api_key=>"HumptyDumpty", :content_type=>"user/provided", 
+            :params=>{:unlimited=>1, :nuffsaid=>0, :order=>{:id=>:asc}, :book_id=>1}}
         ).and_return(@response)
         stub_mocks!
         DataMapper.repository(:test) { @book.cover } # no idea why this doesn't work!
@@ -482,7 +487,7 @@ describe DataMapper::Adapters::RestAdapter do
       it "should fetch the resource by passing the key as a query parameter" do
         @format.should_receive(:resource_path).with({ :model => "chapters" })
         @adapter.rest_client.should_receive(:get).with(
-          {:accept=>"application/mock", :api_key=>"HumptyDumpty", :params=>{:order=>{:id=>:asc}, :book_id=>1}}
+          {:accept=>"application/mock", :api_key=>"HumptyDumpty", :content_type=>"user/provided", :params=>{:order=>{:id=>:asc}, :book_id=>1}}
         ).and_return(@response)
         stub_mocks!
         @adapter.read(@query)
