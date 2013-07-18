@@ -26,7 +26,11 @@ module DataMapperRest
           h.merge(key => dumped_value)
         end
         
-        MultiJson.encode(hash)
+        if @enable_form_urlencoded_submission
+          URI.encode_www_form(hash)
+        else
+          MultiJson.encode(hash)
+        end
       end
       
       def parse_record(json, model)

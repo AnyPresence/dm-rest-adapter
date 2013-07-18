@@ -3,7 +3,7 @@ require 'spec_helper'
 describe DataMapper::Adapters::RestAdapter do
   before(:each) do
     @format = double("format")
-
+    
     @adapter = DataMapper::Adapters::RestAdapter.new(:test, DataMapper::Mash[{
       :host     => "test.tld",
       :port     => 81,
@@ -12,8 +12,9 @@ describe DataMapper::Adapters::RestAdapter do
       :format   => @format,
       :limit_param_name => 'unlimited',
       :offset_param_name => 'nuffsaid',
-      :logging_level => 'fatal',
-      :extra_http_headers => {:api_key => "HumptyDumpty", :content_type => "user/provided"}
+      :logging_level => 'debug',
+      :extra_http_headers => {:api_key => "HumptyDumpty"},
+      :enable_form_urlencoded_submission => true
     }])
     @adapter.rest_client = double("rest_client")
 
@@ -45,7 +46,8 @@ describe DataMapper::Adapters::RestAdapter do
         :password => "secret",
         :format   => "TestFormat",
         :extension => "test",
-        :disable_format_extension_in_request_url => true
+        :disable_format_extension_in_request_url => true,
+        :enable_form_urlencoded_submission => true
       }])
       
       @second_adapter = DataMapper::Adapters::RestAdapter.new(:test, DataMapper::Mash[{
@@ -70,7 +72,8 @@ describe DataMapper::Adapters::RestAdapter do
         :prefix   => "humpty/dumpty/",
         :disable_format_extension_in_request_url => true,
         :limit_param_name => 'unlimited',
-        :offset_param_name => 'nuffsaid'
+        :offset_param_name => 'nuffsaid',
+        :extra_http_headers => {:content_type => "user/provided"}
       }])
       @legacy_response.stub(:code) {200}
       @legacy_response.stub(:body) {""}
@@ -126,23 +129,28 @@ describe DataMapper::Adapters::RestAdapter do
 
   describe "#create" do
     describe "when provided a Resource" do
-      before(:each) do        
-        @resource  = Book.new(
+      before(:each) do
+        @hash = {
+          :id => 333,
           :created_at => DateTime.parse("2009-05-17T22:38:42-07:00"),
           :title => "DataMapper",
-          :author => "Dan Kubb"
-        )
+          :author => "Dan Kubb?"
+        }
+        @resource  = Book.new(@hash)
         @resources = [ @resource ]
+        @a_format = DataMapperRest::Format::Json.new(:enable_form_urlencoded_submission => true)
       end
 
       it "should ask the format for the path to each Model" do
         @format.should_receive(:resource_path).with(:model => "livre")
+        @format.should_receive(:accept).and_return("application/mock")
         stub_mocks!
         @adapter.create(@resources)
       end
 
       it "should query the resource path" do
         @format.stub(:resource_path) { "books.mock" }
+        @format.should_receive(:accept).and_return("application/mock")
         @adapter.rest_client.should_receive(:[]).with("books.mock").and_return(@adapter.rest_client)
         stub_mocks!
         @adapter.create(@resources)
@@ -150,28 +158,33 @@ describe DataMapper::Adapters::RestAdapter do
 
       it "should ask the format to serialize each Resource" do
         @format.should_receive(:string_representation).with(@resource)
+        @format.should_receive(:accept).and_return("application/mock")
         stub_mocks!
         @adapter.create(@resources)
       end
 
       it "should POST the serialized Resource to the resource path" do
-        @format.stub(:string_representation) { "<<a useless format>>" }
+        @adapter.format = @a_format
+        
         @adapter.rest_client.should_receive(:post).with(
-          "<<a useless format>>",
-          { :accept=>"application/mock", :content_type=>"user/provided", :api_key=>"HumptyDumpty" }
+          "id=333&created_at=2009-05-17T22%3A38%3A42-07%3A00&title=DataMapper&author=Dan+Kubb%3F&comment_crazy_mapping",     
+          {:accept=>"application/json", :content_type=>"www-form-urlencoded", :api_key=>"HumptyDumpty"}
         ).and_return(@response)
         stub_mocks!
         @adapter.create(@resources)
+        @adapter.format = @format
       end
 
       it "should ask the format to update the resource with the response" do
         @response.should_receive(:body) { "<<a useless format>>" }
         @format.should_receive(:update_attributes).with(@resource, "<<a useless format>>")
+        @format.should_receive(:accept).and_return("application/mock")
         stub_mocks!
         @adapter.create(@resources)
       end
 
       it "should return an Array of the records" do
+        @format.should_receive(:accept).and_return("application/mock")
         stub_mocks!
         @adapter.create(@resources).should eql @resources
       end
@@ -183,6 +196,7 @@ describe DataMapper::Adapters::RestAdapter do
       before(:each) do
         @query = Book.all.query
         @resources = [ {} ]
+        @format.should_receive(:accept).and_return("application/mock")
       end
 
       it "should ask the format for the resource path" do
@@ -200,7 +214,7 @@ describe DataMapper::Adapters::RestAdapter do
 
       it "should use GET" do
         @adapter.rest_client.should_receive(:get).with(
-          {:accept=>"application/mock", :api_key=>"HumptyDumpty", :content_type=>"user/provided", :params=>{:order=>{:id=>:asc}}}
+          {:accept=>"application/mock", :api_key=>"HumptyDumpty", :params=>{:order=>{:id=>:asc}}}
         ).and_return(@response)
         stub_mocks!
         @adapter.read(@query)
@@ -230,6 +244,7 @@ describe DataMapper::Adapters::RestAdapter do
           "author" => "Shaniquah"
         }
         @records = [ @record, @record2 ]
+        @format.should_receive(:accept).and_return("application/mock")
       end
 
       it "should ask the format for the resource path using the key" do
@@ -247,7 +262,7 @@ describe DataMapper::Adapters::RestAdapter do
 
       it "should use GET" do
         @adapter.rest_client.should_receive(:get).with(
-          {:accept=>"application/mock", :api_key=>"HumptyDumpty", :content_type=>"user/provided"}
+          {:accept=>"application/mock", :api_key=>"HumptyDumpty"}
           ).and_return(@response)
         stub_mocks!
         @adapter.read(@query)
@@ -286,6 +301,7 @@ describe DataMapper::Adapters::RestAdapter do
           "comment" => "garbage"
         }
         @records = [ @record, @record2 ]
+        @format.should_receive(:accept).and_return("application/mock")
       end
 
       it "should ask the format for the resource path" do
@@ -303,13 +319,8 @@ describe DataMapper::Adapters::RestAdapter do
 
       it "should use GET with the conditions appended as params" do
         @adapter.rest_client.should_receive(:get).with(
-            {
-            :accept=>"application/mock", :api_key=>"HumptyDumpty", :content_type=>"user/provided",
-            :params=>{
-              :order=>{:title=>:asc, :author=>:desc, :comment_crazy_mapping=>:asc}, 
-              :author=>"Dan Kubb", 
-              :comment_crazy_mapping=>"garbage"
-              }
+          {:accept=>"application/mock", :api_key=>"HumptyDumpty", 
+            :params=>{:order=>{:title=>:asc, :author=>:desc, :comment_crazy_mapping=>:asc}, :author=>"Dan Kubb", :comment_crazy_mapping=>"garbage"}
             }
         ).and_return(@response)
         stub_mocks!
@@ -334,6 +345,7 @@ describe DataMapper::Adapters::RestAdapter do
         :author => "Dan Kubb"
       )
       @resources = [ @resource ]
+      @format.should_receive(:accept).and_return("application/mock")
     end
 
     it "should ask the format for the resource path using the key" do
@@ -358,8 +370,7 @@ describe DataMapper::Adapters::RestAdapter do
     it "should PUT the serialized Resource to the path" do
       @format.stub(:string_representation) { "<<a useless format>>" }
       @adapter.rest_client.should_receive(:put).with(
-        "<<a useless format>>",
-        { :accept=>"application/mock", :content_type=>"user/provided", :api_key=>"HumptyDumpty" }
+        "<<a useless format>>", {:accept=>"application/mock", :content_type=>"application/mock", :api_key=>"HumptyDumpty"}
       ).and_return(@response)
       stub_mocks!
       @adapter.update({ Book.properties[:author] => "John Doe" }, @resources)
@@ -393,6 +404,7 @@ describe DataMapper::Adapters::RestAdapter do
         :author => "Dan Kubb"
       )
       @resources = [ @resource ]
+      @format.should_receive(:accept).and_return("application/mock")
     end
 
     it "should ask the format for the resource path using the key" do
@@ -410,7 +422,7 @@ describe DataMapper::Adapters::RestAdapter do
 
     it "should DELETE the resource from the path" do
       @adapter.rest_client.should_receive(:delete).with(
-      { :accept => "application/mock", :api_key=>"HumptyDumpty", :content_type=>"user/provided" }
+      { :accept => "application/mock", :api_key=>"HumptyDumpty"}
       ).and_return(@response)
       stub_mocks!
       @adapter.delete(@resources)
@@ -430,13 +442,14 @@ describe DataMapper::Adapters::RestAdapter do
         :author => "Dann Kubb"
       )
       @book.persistence_state = DataMapper::Resource::PersistenceState::Persisted.new(@book)
+      @format.should_receive(:accept).and_return("application/mock")
     end
 
     describe "#read" do
       it "should fetch the resource with the parent ID and an overridden limit and offset with order by clauses" do
         @format.should_receive(:resource_path).with({ :model => "book_covers" })
         @adapter.rest_client.should_receive(:get).with(
-          {:accept=>"application/mock", :api_key=>"HumptyDumpty", :content_type=>"user/provided", 
+          {:accept=>"application/mock", :api_key=>"HumptyDumpty", 
             :params=>{:unlimited=>1, :nuffsaid=>0, :order=>{:id=>:asc}, :book_id=>1}}
         ).and_return(@response)
         stub_mocks!
@@ -460,6 +473,7 @@ describe DataMapper::Adapters::RestAdapter do
         :name => "Dan's Kubblishings"
       )
       @publisher.persistence_state = DataMapper::Resource::PersistenceState::Persisted.new(@publisher)
+      @format.should_receive(:accept).and_return("application/mock")
     end
 
     describe "#read" do
@@ -481,13 +495,14 @@ describe DataMapper::Adapters::RestAdapter do
     before(:each) do
       @book = DifficultBook.new( :id => 1, :title => "DataMapper", :author => "Dann Kubb" )
       @query = @book.chapters.query
+      @format.should_receive(:accept).and_return("application/mock")
     end
 
     describe "#read" do
       it "should fetch the resource by passing the key as a query parameter" do
         @format.should_receive(:resource_path).with({ :model => "chapters" })
         @adapter.rest_client.should_receive(:get).with(
-          {:accept=>"application/mock", :api_key=>"HumptyDumpty", :content_type=>"user/provided", :params=>{:order=>{:id=>:asc}, :book_id=>1}}
+          {:accept=>"application/mock", :api_key=>"HumptyDumpty", :params=>{:order=>{:id=>:asc}, :book_id=>1}}
         ).and_return(@response)
         stub_mocks!
         @adapter.read(@query)
@@ -503,6 +518,7 @@ describe DataMapper::Adapters::RestAdapter do
         :name => "Dan's Kubblishings"
       )
       @publisher.persistence_state = DataMapper::Resource::PersistenceState::Persisted.new(@publisher)
+      @format.should_receive(:accept).and_return("application/mock")
     end
 
     describe "#read" do
@@ -580,6 +596,7 @@ describe DataMapper::Adapters::RestAdapter do
       )
       @book.persistence_state = DataMapper::Resource::PersistenceState::Persisted.new(@book)
       @query = @book.vendors.query
+      @format.should_receive(:accept).and_return("application/mock")
     end
     
     it "should walk the object tree and pass all nested resource information to #resource_path" do

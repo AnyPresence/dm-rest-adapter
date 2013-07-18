@@ -1,16 +1,21 @@
 module DataMapperRest
   module Format
     class AbstractFormat
-  	  attr_accessor :extension, :mime, :repository_name, :record_selector, :collection_selector
+  	  attr_accessor :extension, :accept, :mime, :repository_name, :record_selector, :collection_selector
 
       def initialize(options = {})
         options = default_options.merge(options)
         @extension = options[:extension]
         @extension = nil if @extension == "" # consider blank extension as not present
         @mime = options[:mime]
+        @accept = options[:mime]
         @repository_name = options.fetch(:repository_name, :default)
         @record_selector = options[:record_selector] if options[:record_selector]
         @collection_selector = options[:collection_selector] if options[:collection_selector]
+        @enable_form_urlencoded_submission = options.fetch(:enable_form_urlencoded_submission,false)
+        if @enable_form_urlencoded_submission
+          @mime = "www-form-urlencoded"
+        end
       end
 
       def default_options

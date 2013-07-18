@@ -6,7 +6,11 @@ module DataMapperRest
       end
       
       def string_representation(resource)
-        resource.to_xml
+        if @enable_form_urlencoded_submission
+          URI.encode_www_form(resource)
+        else
+          resource.to_xml
+        end
       end
       
       def parse_collection(xml, model)
