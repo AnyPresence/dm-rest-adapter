@@ -12,15 +12,15 @@ module DataMapperRest
         path_items << { :model => mapped_name(model) }
 
         path = @format.resource_path(*path_items)
+        payload = @format.string_representation(resource)
+        headers = create_headers(:content_type => @format.mime)
         
-        DataMapper.logger.debug("About to POST using #{path}")
+        DataMapper.logger.debug("About to POST to #{path} with:\nHeaders #{headers}\nData: #{payload}")
         
         response = @rest_client[path].post(
-          @format.string_representation(resource),
-          create_headers(:content_type => @format.mime)
+          payload,
+          headers
         ) do |response, request, result, &block|
-          
-          DataMapper.logger.debug("Response to POST was #{response.inspect}")
           
           # See http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.2 for HTTP response 201
           if @options[:follow_on_create] && [201, 301, 302, 307].include?(response.code)
@@ -31,8 +31,11 @@ module DataMapperRest
             response.return!(request, result, &block)
           end
         end
-
-        @format.update_attributes(resource, response.body)
+        
+        response_body = response.body
+        DataMapper.logger.debug("Response to POST was #{response.code} #{response_body}")
+        
+        @format.update_attributes(resource, response_body)
       end
     end
 
@@ -72,7 +75,7 @@ module DataMapperRest
         
         response = @rest_client[path].get(query_options)
         
-        DataMapper.logger.debug("Response to GET was #{response.body}")
+        DataMapper.logger.debug("Response to GET was #{response.code} #{response.body}")
         records = @format.parse_collection(response.body, model)
       end
 
@@ -90,14 +93,19 @@ module DataMapperRest
 
         dirty_attributes.each { |p, v| p.set!(resource, v) }
 
-        response = @rest_client[@format.resource_path(*path_items)].put(
-          @format.string_representation(resource),
-          create_headers(:content_type => @format.mime)
-        )
+        path = @format.resource_path(*path_items)
+        payload = @format.string_representation(resource)
+        headers = create_headers(:content_type => @format.mime)
         
-        DataMapper.logger.debug("Response to PUT was #{response.body}")
+        DataMapper.logger.debug("About to PUT to #{path} with:\nHeaders #{headers}\nData: #{payload}")
         
-        @format.update_attributes(resource, response.body)
+        response = @rest_client[path].put(payload, headers)
+        
+        response_body = response.body
+        
+        DataMapper.logger.debug("Response to PUT was #{response.code} #{response_body}")
+        
+        @format.update_attributes(resource, response_body)
       end.size
     end
 

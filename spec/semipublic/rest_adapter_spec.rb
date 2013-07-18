@@ -388,7 +388,7 @@ describe DataMapper::Adapters::RestAdapter do
     end
 
     it "should ask the format to update the resource with the response" do
-      @response.should_receive(:body).twice { "<<a useless format>>" }
+      @response.should_receive(:body).and_return { "<<a useless format>>" }
       @format.should_receive(:update_attributes).with(@resource, "<<a useless format>>")
       stub_mocks!
       @adapter.update({ Book.properties[:author] => "John Doe" }, @resources)
