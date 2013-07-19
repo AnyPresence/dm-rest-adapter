@@ -149,12 +149,9 @@ module DataMapperRest
     def initialize(*)
       super
       
-      DataMapper.logger.debug("Initializing RestClient with #{normalized_uri}")
-      @rest_client = RestClient::Resource.new(normalized_uri)
-      
-      initialize_logger
-      
       raise ArgumentError, "Missing :format in @options" unless @options[:format]
+
+      initialize_logger
 
       case @options[:format]
         when "xml"
@@ -206,6 +203,9 @@ module DataMapperRest
       
       DataMapper.logger.info("Will use record selector #{@options[:record_selector]}") if @options[:record_selector]
       DataMapper.logger.info("Will use collection selector #{@options[:collection_selector]}") if @options[:collection_selector]
+      
+      DataMapper.logger.debug("Initializing RestClient with #{normalized_uri}")
+      @rest_client = RestClient::Resource.new(normalized_uri)
     end
     
     def load_format_from_string(class_name)
@@ -354,11 +354,7 @@ module DataMapperRest
       
       if level == 'debug'
         DataMapper.logger.debug("Adding REST client debugging proxy")
-        RestClient.log =  Object.new.tap do |proxy|
-            def proxy.<<(message)
-              DataMapper.logger.debug message
-            end
-        end
+        RestClient.log =  $stdout
       end
     end
     
