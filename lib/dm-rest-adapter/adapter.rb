@@ -149,9 +149,10 @@ module DataMapperRest
     def initialize(*)
       super
       
-      initialize_logger
+      DataMapper.logger.debug("Initializing RestClient with #{normalized_uri}")
+      @rest_client = RestClient::Resource.new(normalized_uri)
       
-      DataMapper.logger.debug("Initializing REST adapter with #{@options.inspect}")
+      initialize_logger
       
       raise ArgumentError, "Missing :format in @options" unless @options[:format]
 
@@ -205,18 +206,6 @@ module DataMapperRest
       
       DataMapper.logger.info("Will use record selector #{@options[:record_selector]}") if @options[:record_selector]
       DataMapper.logger.info("Will use collection selector #{@options[:collection_selector]}") if @options[:collection_selector]
-            
-      DataMapper.logger.debug("Initializing RestClient with #{normalized_uri}")
-      @rest_client = RestClient::Resource.new(normalized_uri)
-      if DataMapper.logger.level == 0 # debug level
-        DataMapper.logger.debug("Adding REST client debugging proxy")
-        RestClient.log =
-          Object.new.tap do |proxy|
-            def proxy.<<(message)
-              DataMapper.logger.debug message
-            end
-          end
-      end
     end
     
     def load_format_from_string(class_name)
@@ -362,6 +351,15 @@ module DataMapperRest
         level = @options[:logging_level].downcase
       end
       DataMapper::Logger.new(STDOUT,level)
+      
+      if level == 'debug'
+        DataMapper.logger.debug("Adding REST client debugging proxy")
+        RestClient.log =  Object.new.tap do |proxy|
+            def proxy.<<(message)
+              DataMapper.logger.debug message
+            end
+        end
+      end
     end
     
   end
