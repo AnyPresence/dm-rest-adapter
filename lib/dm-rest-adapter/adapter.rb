@@ -350,7 +350,7 @@ module DataMapperRest
       if @options[:logging_level] && %w[ off fatal error warn info debug ].include?(@options[:logging_level].downcase)
         level = @options[:logging_level].downcase
       end
-      DataMapper::Logger.new(STDOUT,level)
+      DataMapper::Logger.new($stdout,level)
       
       if level == 'debug'
         DataMapper.logger.debug("Adding REST client debugging proxy")

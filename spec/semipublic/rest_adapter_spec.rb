@@ -167,7 +167,7 @@ describe DataMapper::Adapters::RestAdapter do
         @adapter.format = @a_format
         hash = @hash.merge({:comment_crazy_mapping => nil})
         @adapter.rest_client.should_receive(:post).with(
-          hash , 
+          { :livre => hash }, 
           {:accept=>"application/json", :content_type=>"www-form-urlencoded", :api_key=>"HumptyDumpty"}
         ).and_return(@response)
         stub_mocks!

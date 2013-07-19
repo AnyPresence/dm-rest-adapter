@@ -7,12 +7,13 @@ module DataMapperRest
       
       def generate_payload(resource)
         if @enable_form_urlencoded_submission
-          properties_to_serialize(resource).reduce({}) do |h, property|
+          hash = properties_to_serialize(resource).reduce({}) do |h, property|
             key = property.field.to_sym
             dumped_value = ''
             value = property.get(resource)
             h.merge(key => property.dump(value))
           end
+          { resource_name(model).to_sym => hash } 
         else
           resource.to_xml
         end
