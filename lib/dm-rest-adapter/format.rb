@@ -75,9 +75,9 @@ module DataMapperRest
         model.properties(model.default_repository_name)
       end
       
-      def string_representation(resource)
+      def generate_payload(resource)
         raise NotImplementedError,
-          "#{self.class}#string_representation not implemented"
+          "#{self.class}#generate_payload not implemented"
       end
       
       def parse_collection(body, model)

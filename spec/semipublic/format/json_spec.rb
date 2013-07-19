@@ -6,7 +6,7 @@ describe DataMapperRest::Format::Json do
   
   it_should_behave_like "a Format"
   
-  describe "#string_representation" do
+  describe "#generate_payload" do
     before(:each) do
       @format = DataMapperRest::Format::Json.new
       @time = DateTime.now
@@ -26,7 +26,7 @@ describe DataMapperRest::Format::Json do
           :author     => "Testy McTesty",
           :comment    => "Why I write such good books?"
         )
-        book_json = @format.string_representation(book)
+        book_json = @format.generate_payload(book)
         book_json.should == @json
       end
       
@@ -43,7 +43,7 @@ describe DataMapperRest::Format::Json do
           :state_data => ["humpty","dumpty"],
           :titlebar_region => "Snickers"
         )
-        message_json = @format.string_representation(message)
+        message_json = @format.generate_payload(message)
         message_json.should == @msg_json
       end
     end
@@ -62,7 +62,7 @@ describe DataMapperRest::Format::Json do
           :publisher_id => 7,
           :comment      => "Open your eyes, dental floss!"
         )
-        book_json = @format.string_representation(book)
+        book_json = @format.generate_payload(book)
         book_json.should == @json
       end
     end

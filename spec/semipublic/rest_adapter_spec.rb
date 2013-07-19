@@ -26,13 +26,13 @@ describe DataMapper::Adapters::RestAdapter do
   describe "#initialize" do
     before(:each) do
       class TestFormat < DataMapperRest::Format::AbstractFormat
-        def string_representation(resource)
+        def generate_payload(resource)
           "<<mock format>>"
         end
       end
       @legacy_format = TestFormat.new
       @legacy_format.stub(:mime) {"application/mock"}
-      @legacy_format.stub(:string_representation) {"<<mock format>>"}
+      @legacy_format.stub(:generate_payload) {"<<mock format>>"}
       @legacy_format.stub(:update_attributes) {double()}
       @legacy_format.stub(:parse_collection) {[]}
       @legacy_format.stub(:parse_record) {double()}
@@ -157,7 +157,7 @@ describe DataMapper::Adapters::RestAdapter do
       end
 
       it "should ask the format to serialize each Resource" do
-        @format.should_receive(:string_representation).with(@resource)
+        @format.should_receive(:generate_payload).with(@resource)
         @format.should_receive(:accept).and_return("application/mock")
         stub_mocks!
         @adapter.create(@resources)
@@ -165,9 +165,9 @@ describe DataMapper::Adapters::RestAdapter do
 
       it "should POST the serialized Resource to the resource path" do
         @adapter.format = @a_format
-        
+        hash = @hash.merge({:comment_crazy_mapping => nil})
         @adapter.rest_client.should_receive(:post).with(
-          "id=333&created_at=2009-05-17T22%3A38%3A42-07%3A00&title=DataMapper&author=Dan+Kubb%3F&comment_crazy_mapping",     
+          hash , 
           {:accept=>"application/json", :content_type=>"www-form-urlencoded", :api_key=>"HumptyDumpty"}
         ).and_return(@response)
         stub_mocks!
@@ -362,13 +362,13 @@ describe DataMapper::Adapters::RestAdapter do
     end
 
     it "should ask the Format to serialize each Resource" do
-      @format.should_receive(:string_representation).with(@resource)
+      @format.should_receive(:generate_payload).with(@resource)
       stub_mocks!
       @adapter.update({ Book.properties[:author] => "John Doe" }, @resources)
     end
 
     it "should PUT the serialized Resource to the path" do
-      @format.stub(:string_representation) { "<<a useless format>>" }
+      @format.stub(:generate_payload) { "<<a useless format>>" }
       @adapter.rest_client.should_receive(:put).with(
         "<<a useless format>>", {:accept=>"application/mock", :content_type=>"application/mock", :api_key=>"HumptyDumpty"}
       ).and_return(@response)
@@ -614,7 +614,7 @@ describe DataMapper::Adapters::RestAdapter do
     {
       :resource_path => "mock",
       :mime => "application/mock",
-      :string_representation => "<<mock format>>",
+      :generate_payload => "<<mock format>>",
       :update_attributes => double(),
       :parse_collection => [],
       :parse_record => double()

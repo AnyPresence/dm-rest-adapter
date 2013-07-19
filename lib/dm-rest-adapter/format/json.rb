@@ -8,7 +8,7 @@ module DataMapperRest
         DataMapper::Mash.new({ :mime => "application/json", :extension => "json" })
       end
       
-      def string_representation(resource)
+      def generate_payload(resource)
         model = resource.model
         
         hash = properties_to_serialize(resource).reduce({}) do |h, property|
@@ -27,7 +27,7 @@ module DataMapperRest
         end
         
         if @enable_form_urlencoded_submission
-          URI.encode_www_form(hash)
+          hash
         else
           MultiJson.encode(hash)
         end

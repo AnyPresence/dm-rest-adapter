@@ -6,7 +6,7 @@ describe DataMapperRest::Format::Xml do
   
   it_should_behave_like "a Format"
   
-  describe "#string_representation" do
+  describe "#generate_payload" do
     before(:each) do
       @format = DataMapperRest::Format::Xml.new
       @time = DateTime.now
@@ -29,7 +29,7 @@ describe DataMapperRest::Format::Xml do
         :author     => "Testy McTesty",
         :comment    => "Oranges"
       )
-      book_xml = DataMapper::Ext::String.compress_lines(@format.string_representation(book))
+      book_xml = DataMapper::Ext::String.compress_lines(@format.generate_payload(book))
       # FIXME: This hack to silence 'single' vs "double" quotes and <a> <b> vs <a></b> fragile test failures isn't ideal
       book_xml.tr("'", '"').tr('"', "'").gsub(/> </, "><").should == @xml.tr("'", '"').tr('"', "'").gsub(/> </, "><")
     end

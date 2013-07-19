@@ -12,7 +12,7 @@ module DataMapperRest
         path_items << { :model => mapped_name(model) }
 
         path = @format.resource_path(*path_items)
-        payload = @format.string_representation(resource)
+        payload = @format.generate_payload(resource)
         headers = create_headers(:content_type => @format.mime)
         
         DataMapper.logger.debug("About to POST to #{path} with:\nHeaders #{headers}\nData: #{payload}")
@@ -94,7 +94,7 @@ module DataMapperRest
         dirty_attributes.each { |p, v| p.set!(resource, v) }
 
         path = @format.resource_path(*path_items)
-        payload = @format.string_representation(resource)
+        payload = @format.generate_payload(resource)
         headers = create_headers(:content_type => @format.mime)
         
         DataMapper.logger.debug("About to PUT to #{path} with:\nHeaders #{headers}\nData: #{payload}")

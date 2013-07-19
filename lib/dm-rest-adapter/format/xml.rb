@@ -5,9 +5,14 @@ module DataMapperRest
         DataMapper::Mash.new({ :mime => "application/xml", :extension => "xml" })
       end
       
-      def string_representation(resource)
+      def generate_payload(resource)
         if @enable_form_urlencoded_submission
-          URI.encode_www_form(resource)
+          properties_to_serialize(resource).reduce({}) do |h, property|
+            key = property.field.to_sym
+            dumped_value = ''
+            value = property.get(resource)
+            h.merge(key => property.dump(value))
+          end
         else
           resource.to_xml
         end
