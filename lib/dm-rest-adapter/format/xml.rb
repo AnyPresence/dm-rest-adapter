@@ -13,7 +13,7 @@ module DataMapperRest
             value = property.get(resource)
             h.merge(key => property.dump(value))
           end
-          { model.storage_name.downcase.to_sym => hash } 
+          { element_name(model).to_sym => hash } 
         else
           resource.to_xml
         end

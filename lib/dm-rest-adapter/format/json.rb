@@ -27,7 +27,7 @@ module DataMapperRest
         end
         
         if @enable_form_urlencoded_submission
-          { model.storage_name.downcase.to_sym => hash }
+          { element_name(model).to_sym => hash }
         else
           MultiJson.encode(hash)
         end
