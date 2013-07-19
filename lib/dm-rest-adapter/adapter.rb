@@ -15,7 +15,7 @@ module DataMapperRest
         payload = @format.generate_payload(resource)
         headers = create_headers(:content_type => @format.mime)
         
-        DataMapper.logger.debug("About to POST to #{path} with:\nHeaders #{headers}\nData: #{payload}")
+        @log.debug("About to POST to #{path} with:\nHeaders #{headers}\nData: #{payload}")
         
         response = @rest_client[path].post(
           payload,
@@ -33,7 +33,7 @@ module DataMapperRest
         end
         
         response_body = response.body
-        DataMapper.logger.debug("Response to POST was #{response.code} #{response_body}")
+        @log.debug("Response to POST was #{response.code} #{response_body}")
         
         @format.update_attributes(resource, response_body)
       end
@@ -43,7 +43,7 @@ module DataMapperRest
       model = query.model
 
       path_items = extract_parent_items_from_query(query)
-      DataMapper.logger.debug("Reading #{path_items}")
+      @log.debug("Reading #{path_items}")
       
       records = []
       
@@ -52,15 +52,15 @@ module DataMapperRest
           path_items << { :model => mapped_name(model) , :key => id }
           path = @format.resource_path(*path_items)
           
-          DataMapper.logger.debug("About to GET using #{path}")
+          @log.debug("About to GET using #{path}")
           
           response = @rest_client[path].get(create_headers())
           
-          DataMapper.logger.debug("Response to GET was #{response.inspect}")
+          @log.debug("Response to GET was #{response.inspect}")
           
           records = [ @format.parse_record(response.body, model) ]
         rescue RestClient::ResourceNotFound
-          DataMapper.logger.error("Resource was not found at #{path}. Response was #{response.inspect}")
+          @log.error("Resource was not found at #{path}. Response was #{response.inspect}")
           records = []
         end
       else
@@ -71,11 +71,11 @@ module DataMapperRest
         
         path = @format.resource_path(*path_items)
         
-        DataMapper.logger.debug("About to GET using #{path} with query_options of #{query_options.inspect}")
+        @log.debug("About to GET using #{path} with query_options of #{query_options.inspect}")
         
         response = @rest_client[path].get(query_options)
         
-        DataMapper.logger.debug("Response to GET was #{response.code} #{response.body}")
+        @log.debug("Response to GET was #{response.code} #{response.body}")
         records = @format.parse_collection(response.body, model)
       end
 
@@ -97,13 +97,13 @@ module DataMapperRest
         payload = @format.generate_payload(resource)
         headers = create_headers(:content_type => @format.mime)
         
-        DataMapper.logger.debug("About to PUT to #{path} with:\nHeaders #{headers}\nData: #{payload}")
+        @log.debug("About to PUT to #{path} with:\nHeaders #{headers}\nData: #{payload}")
         
         response = @rest_client[path].put(payload, headers)
         
         response_body = response.body
         
-        DataMapper.logger.debug("Response to PUT was #{response.code} #{response_body}")
+        @log.debug("Response to PUT was #{response.code} #{response_body}")
         
         @format.update_attributes(resource, response_body)
       end.size
@@ -122,7 +122,7 @@ module DataMapperRest
           create_headers()
         )
         
-        DataMapper.logger.debug("Response to DELETE was #{response.body}")
+        @log.debug("Response to DELETE was #{response.body}")
         
         (200..207).include?(response.code)
       end.size
@@ -156,37 +156,37 @@ module DataMapperRest
       case @options[:format]
         when "xml"
           @format = Format::Xml.new(@options.merge(:repository_name => name))
-          DataMapper.logger.info("Using XML format.")
+          @log.info("Using XML format.")
         when "json"
           @format = Format::Json.new(@options.merge(:repository_name => name))
-          DataMapper.logger.info("Using JSON format.")
+          @log.info("Using JSON format.")
         when String
           @format = load_format_from_string(@options[:format]).new(@options.merge(:repository_name => name))
-          DataMapper.logger.info("Using loaded format #{@format.inspect}.")
+          @log.info("Using loaded format #{@format.inspect}.")
         else
           @format = @options[:format]
-          DataMapper.logger.info("Using format of #{@format.inspect}")
+          @log.info("Using format of #{@format.inspect}")
       end
       
       if @options[:limit_param_name]
         @has_overridden_limit_param = !(@options[:limit_param_name].nil? or @options[:limit_param_name].empty?)
-        DataMapper.logger.warn(":limit_param_name was given without specifying an actual parameter name!") unless @has_overridden_limit_param
+        @log.warn(":limit_param_name was given without specifying an actual parameter name!") unless @has_overridden_limit_param
          
         @limit_param_name = @options[:limit_param_name].to_sym
-        DataMapper.logger.info("Will use #{@limit_param_name} for a limit parameter name.")
+        @log.info("Will use #{@limit_param_name} for a limit parameter name.")
       end
       
       if @options[:offset_param_name]
         @has_overridden_offset_param = !(@options[:offset_param_name].nil? or @options[:offset_param_name].empty?) 
-        DataMapper.logger.warn(":offset_param_name was given without specifying an actual parameter name!") unless @has_overridden_offset_param
+        @log.warn(":offset_param_name was given without specifying an actual parameter name!") unless @has_overridden_offset_param
         
         @offset_param_name = @options[:offset_param_name].to_sym
-        DataMapper.logger.info("Will use #{@offset_param_name} for an offset parameter name.")
+        @log.info("Will use #{@offset_param_name} for an offset parameter name.")
       end
       
       if @options[:disable_format_extension_in_request_url]
         @format.extension = nil
-        DataMapper.logger.info("Will NOT use format extension in requested URLs.")
+        @log.info("Will NOT use format extension in requested URLs.")
       end
       
       if @options[:extra_http_headers]
@@ -195,16 +195,16 @@ module DataMapperRest
           @extra_headers[key.to_sym] = value
         end
         
-        DataMapper.logger.info("Will use extra HTTP headers: #{@extra_headers.inspect}")
-        DataMapper.logger.warn("'Content-Type' will always be set to '#{@extra_headers[:content_type]}'. Please ensure that's exactly what you intended!") if @extra_headers.has_key?(:content_type)
+        @log.info("Will use extra HTTP headers: #{@extra_headers.inspect}")
+        @log.warn("'Content-Type' will always be set to '#{@extra_headers[:content_type]}'. Please ensure that's exactly what you intended!") if @extra_headers.has_key?(:content_type)
       end
       
-      DataMapper.logger.info("Will use form URL encoded submission for POST and PUT calls.")if @options[:enable_form_urlencoded_submission]
+      @log.info("Will use form URL encoded submission for POST and PUT calls.")if @options[:enable_form_urlencoded_submission]
       
-      DataMapper.logger.info("Will use record selector #{@options[:record_selector]}") if @options[:record_selector]
-      DataMapper.logger.info("Will use collection selector #{@options[:collection_selector]}") if @options[:collection_selector]
+      @log.info("Will use record selector #{@options[:record_selector]}") if @options[:record_selector]
+      @log.info("Will use collection selector #{@options[:collection_selector]}") if @options[:collection_selector]
       
-      DataMapper.logger.debug("Initializing RestClient with #{normalized_uri}")
+      @log.debug("Initializing RestClient with #{normalized_uri}")
       @rest_client = RestClient::Resource.new(normalized_uri)
     end
     
@@ -295,18 +295,18 @@ module DataMapperRest
       model = query.model
       conditions = query.conditions
       params = {}
-      DataMapper.logger.debug("Conditions are #{conditions.inspect}")
+      @log.debug("Conditions are #{conditions.inspect}")
       
       options = query.options
-      DataMapper.logger.debug("Options for limit and offset are #{@has_overridden_limit_param} for limit, and #{@has_overridden_offset_param} for offset")
+      @log.debug("Options for limit and offset are #{@has_overridden_limit_param} for limit, and #{@has_overridden_offset_param} for offset")
       
       if @has_overridden_limit_param and options[:limit]
-        DataMapper.logger.debug("Setting limit param using #{@limit_param_name.to_sym} and value #{options[:limit]}")
+        @log.debug("Setting limit param using #{@limit_param_name.to_sym} and value #{options[:limit]}")
         params[@limit_param_name.to_sym] = options[:limit]
       end
 
       if @has_overridden_offset_param and options[:offset]
-        DataMapper.logger.debug("Setting offset param using #{@offset_param_name.to_sym} and value #{options[:offset]}")
+        @log.debug("Setting offset param using #{@offset_param_name.to_sym} and value #{options[:offset]}")
         params[@offset_param_name.to_sym] = options[:offset]
       end
 
@@ -351,9 +351,9 @@ module DataMapperRest
         level = @options[:logging_level].downcase
       end
       DataMapper::Logger.new($stdout,level)
-      
+      @log = DataMapper.logger
       if level == 'debug'
-        DataMapper.logger.debug("Adding REST client debugging proxy")
+        @log.debug("Adding REST client debugging proxy")
         RestClient.log =  $stdout
       end
     end
