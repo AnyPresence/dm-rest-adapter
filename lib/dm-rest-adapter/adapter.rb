@@ -208,7 +208,15 @@ module DataMapperRest
             
       DataMapper.logger.debug("Initializing RestClient with #{normalized_uri}")
       @rest_client = RestClient::Resource.new(normalized_uri)
-      RestClient.log = STDOUT if DataMapper.logger.level == 0
+      if DataMapper.logger.level == 0 # debug level
+        DataMapper.logger.debug("Adding REST client debugging proxy")
+        RestClient.log =
+          Object.new.tap do |proxy|
+            def proxy.<<(message)
+              DataMapper.logger.debug message
+            end
+          end
+      end
     end
     
     def load_format_from_string(class_name)
