@@ -37,7 +37,9 @@ module DataMapperRest
         hash = {}
         
         if @record_selector
-          hash = JsonPath.on(json, record_selector_expression(model)).first
+          selector = record_selector_expression(model)
+          path = JsonPath.new(selector)
+          hash = path.on(json).first
         else
           hash = JSON.parse(json)
         end
@@ -50,8 +52,16 @@ module DataMapperRest
         array = []
         
         if @collection_selector
-          array = JsonPath.on(json, collection_selector_expression(model)).first
+          selector = collection_selector_expression(model)
+          DataMapper.logger.debug("Selector is #{selector.inspect}")
+          path = JsonPath.new(selector)
+          DataMapper.logger.debug("Path is #{path.inspect}")
+          array = path.on(json)
+          DataMapper.logger.debug("Array is #{array.inspect}")
           raise "Collection selector resulted in an error." if array.nil?
+          unless selector.start_with?('$..')
+            array = array.first
+          end  
         else
           parsed_collection = JSON.parse(json)
           array = parsed_collection.kind_of?(Array) ? parsed_collection : [parsed_collection]
@@ -67,14 +77,14 @@ module DataMapperRest
       
       def record_from_hash(hash, field_to_property)
         record = {}
-        hash.each_pair do |field, value|
+        hash.each do |field, value|
           next unless property = field_to_property[field]
           record[field] = property.typecast(value)
         end
         
         record
       end
-      
+
       def record_selector_expression(model)
         "$.#{transform_selector_expression(@record_selector)}"
       end

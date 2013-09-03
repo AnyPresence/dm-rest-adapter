@@ -104,7 +104,7 @@ describe DataMapperRest::Format::Json do
     end
     
     it "loads a record from a string represenation using a provided selector" do
-      @format.record_selector = 'forecast.txt_forecast'
+      @format.record_selector = '$.forecast.txt_forecast'
       record = @format.parse_record(@weather_json_instance, ForecastDay)
       record["period"].should == 0
   		record["icon"].should == "partlycloudy"
@@ -118,6 +118,7 @@ describe DataMapperRest::Format::Json do
   
   describe "#parse_collection" do
     before(:each) do
+      DataMapper::Logger.new($stdout,'debug')
       @format = DataMapperRest::Format::Json.new
       @time = DateTime.new
       @json = '[{"id":1,"created_at":"' + @time.to_s + '","title":"Testing","author":"Testy McTesty","comment_crazy_mapping":"Itzy Bitzy Spider"},' +
@@ -209,5 +210,14 @@ describe DataMapperRest::Format::Json do
       collection.should_not be_nil
       collection.should have(15).entries
     end
+    
+    it "loads a recordset from a JSON string with nested array and hash properties using the provided selector" do
+      data = DNBDIRECT_JSON_COLLECTION
+      @format.collection_selector = ".companyResults.*"
+      collection = @format.parse_collection(data, Company)
+      collection.should_not be_nil
+      collection.should have(20).entries
+    end
+    
   end
 end

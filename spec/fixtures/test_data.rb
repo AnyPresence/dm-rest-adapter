@@ -867,3 +867,631 @@ JSON
 file = File.open("#{Dir.pwd}/spec/Notices.xml", "rb")
 NOTICES_XML_COLLECTION = DataMapper::Ext::String.compress_lines( file.read )
 file.close
+
+DNBDIRECT_JSON_COLLECTION = <<-JSON
+{
+    "navigators": {
+        "locationNavigators": null,
+        "industryNavigators": null,
+        "employeeNavigators": null,
+        "locationTypeNavigators": null,
+        "ownershipTypeNavigators": null,
+        "salesNavigators": null
+    },
+    "resultSet": {
+        "hit": [
+            {
+                "companyResults": {
+                    "country": "ea idtntUseStbzW",
+                    "city": "insutApPp",
+                    "sales": 62552930,
+                    "locationType": "drsauHqtaeeroRp",
+                    "countryId": 53013,
+                    "parentDuns": "146148890D62",
+                    "ultimateParentDuns": "881061494spT",
+                    "postalCode": null,
+                    "familyTreeSize": 131542,
+                    "address1": "ro5 rBi0l0d.tA pv8Rop",
+                    "exchanges": [],
+                    "dbas": {
+                        "dba": []
+                    },
+                    "primaryUrl": ".ohrtwwop/t:ecvowshm/.1LW",
+                    "nonMarketableCompany": null,
+                    "stateOrProvince": "TX6cq",
+                    "historicalIndicator": false,
+                    "doNotCallRegistry": false,
+                    "hqPhone": "-5341405207-sMw",
+                    "companyId": 30016434787199868,
+                    "companyName": "so ,'cI.ornHvetKH",
+                    "duns": "118861264b4o"
+                },
+                "hitNumber": 1
+            },
+            {
+                "companyResults": {
+                    "country": "aSt tstUndeieZUg",
+                    "city": "snAtiuHuV",
+                    "sales": 251900.7,
+                    "locationType": "aurHreadqstesqt",
+                    "countryId": 52189,
+                    "parentDuns": "04916848111w",
+                    "ultimateParentDuns": "841180694 mj",
+                    "postalCode": null,
+                    "familyTreeSize": 546991,
+                    "address1": "t5poBv 0r. 8ri0Adl851",
+                    "exchanges": [],
+                    "dbas": {
+                        "dba": []
+                    },
+                    "primaryUrl": ".esoh.:/wtrm/wwochvtopnnT",
+                    "nonMarketableCompany": null,
+                    "stateOrProvince": "XTl8H",
+                    "historicalIndicator": true,
+                    "doNotCallRegistry": true,
+                    "hqPhone": "0435--021547YO2",
+                    "companyId": 50837042350824584,
+                    "companyName": "e'r,ovnocIHs .z 5",
+                    "duns": "181166284pOz"
+                },
+                "hitNumber": 2
+            },
+            {
+                "companyResults": {
+                    "country": "d eUinettsSatcBY",
+                    "city": "tHihSlsl rokFO",
+                    "sales": 240.74373,
+                    "locationType": "qsrateHearudwlF",
+                    "countryId": 14781,
+                    "parentDuns": "891801644LpC",
+                    "ultimateParentDuns": "988414601N8B",
+                    "postalCode": null,
+                    "familyTreeSize": 356781,
+                    "address1": ".fJ1wk 0yk3P 6ry",
+                    "exchanges": [
+                        {
+                            "tickerSymbol": "DN Bo K",
+                            "exchangeName": "ESNY0a3"
+                        },
+                        {
+                            "tickerSymbol": "DB 5di7",
+                            "exchangeName": "DfsodlsureyUQ"
+                        },
+                        {
+                            "tickerSymbol": " DBNFA9",
+                            "exchangeName": "SQNTDAACA Idj"
+                        },
+                        {
+                            "tickerSymbol": "DBN pLh",
+                            "exchangeName": "XBXM OfeC"
+                        },
+                        {
+                            "tickerSymbol": "NDB 4VV",
+                            "exchangeName": "DASA2 QNyk5"
+                        },
+                        {
+                            "tickerSymbol": "ND BeV2",
+                            "exchangeName": "egrit ecEAd DUQz"
+                        },
+                        {
+                            "tickerSymbol": "NDB gRZ",
+                            "exchangeName": " ocionfltoi aNahCga2Ed"
+                        },
+                        {
+                            "tickerSymbol": "ND BqkD",
+                            "exchangeName": "MXXP SOR6g"
+                        },
+                        {
+                            "tickerSymbol": " BNDj1z",
+                            "exchangeName": "SYrN aAcED5Z"
+                        },
+                        {
+                            "tickerSymbol": "5BD WPD",
+                            "exchangeName": "MciunhABk"
+                        },
+                        {
+                            "tickerSymbol": "BDNQjU",
+                            "exchangeName": "opCioOcagnhs ti6ve"
+                        }
+                    ],
+                    "dbas": {
+                        "dba": [
+                            "B&DeLw"
+                        ]
+                    },
+                    "primaryUrl": "dc/m.:p/twnbwhwot.ZEG",
+                    "nonMarketableCompany": null,
+                    "stateOrProvince": "JN5Um",
+                    "historicalIndicator": false,
+                    "doNotCallRegistry": false,
+                    "hqPhone": "7301505-9-92eyd",
+                    "companyId": 73458872807592340,
+                    "companyName": "nrdhtoBtD TC&nas ierae oroturep SVZ",
+                    "duns": "981814064d7R"
+                },
+                "hitNumber": 3
+            },
+            {
+                "companyResults": {
+                    "country": "easdSitUtt enmNt",
+                    "city": "CmuimgnzSl",
+                    "sales": 2071.816,
+                    "locationType": "rqudHteaeasrZ5e",
+                    "countryId": 37901,
+                    "parentDuns": "313732147STi",
+                    "ultimateParentDuns": "4241076582eV",
+                    "postalCode": null,
+                    "familyTreeSize": 6721453,
+                    "address1": "P20n l2 Rd0eyed OE",
+                    "exchanges": [],
+                    "dbas": {
+                        "dba": []
+                    },
+                    "primaryUrl": "sirpttcowvrc.hinmpohoewe/:o.w/ZiM",
+                    "nonMarketableCompany": null,
+                    "stateOrProvince": "GAtaZ",
+                    "historicalIndicator": true,
+                    "doNotCallRegistry": false,
+                    "hqPhone": "89-72803729-8g4",
+                    "companyId": 84113408335335280,
+                    "companyName": "ucornocHI rons i.oePPsviecr dtD9j",
+                    "duns": "103005746KnD"
+                },
+                "hitNumber": 4
+            },
+            {
+                "companyResults": {
+                    "country": "snUd atSeitetKye",
+                    "city": "rodBannpGa",
+                    "sales": null,
+                    "locationType": "eadrHusraeqtTTj",
+                    "countryId": 60190,
+                    "parentDuns": "817796692TMd",
+                    "ultimateParentDuns": "699682177gVP",
+                    "postalCode": null,
+                    "familyTreeSize": 3455,
+                    "address1": "S45 152tht 488X7E",
+                    "exchanges": [],
+                    "dbas": {
+                        "dba": []
+                    },
+                    "primaryUrl": "5rB",
+                    "nonMarketableCompany": null,
+                    "stateOrProvince": "SDDs1",
+                    "historicalIndicator": false,
+                    "doNotCallRegistry": false,
+                    "hqPhone": "506-22850-18VOw",
+                    "companyId": 366586623932,
+                    "companyName": "ootl aetreBHBsaam eldAcck  vAFqr",
+                    "duns": "796672189QCR"
+                },
+                "hitNumber": 5
+            },
+            {
+                "companyResults": {
+                    "country": "tlh neNehaTesdrGc9",
+                    "city": "Eveohndnirwt",
+                    "sales": null,
+                    "locationType": "aqetuersHrdaisL",
+                    "countryId": 84596,
+                    "parentDuns": "409764549gOU",
+                    "ultimateParentDuns": "5946704946j5",
+                    "postalCode": null,
+                    "familyTreeSize": 9038,
+                    "address1": "aHt0sr2 a5toog7qb",
+                    "exchanges": [],
+                    "dbas": {
+                        "dba": []
+                    },
+                    "primaryUrl": "gvJ",
+                    "nonMarketableCompany": null,
+                    "stateOrProvince": "nrdNotoraaB-bBdd",
+                    "historicalIndicator": true,
+                    "doNotCallRegistry": false,
+                    "hqPhone": "8030490293S3",
+                    "companyId": 386544606450,
+                    "companyName": "rreere e.vencBliove.oPsVo SHs UPa",
+                    "duns": "714012614seY"
+                },
+                "hitNumber": 6
+            },
+            {
+                "companyResults": {
+                    "country": "nUSetsdiaet tfO8",
+                    "city": "wttOamueSC",
+                    "sales": 4101.7,
+                    "locationType": "n oSaogeiLtnlciPqU",
+                    "countryId": 67973,
+                    "parentDuns": null,
+                    "ultimateParentDuns": null,
+                    "postalCode": null,
+                    "familyTreeSize": null,
+                    "address1": "Sa2 rH1d06tig nzTD",
+                    "exchanges": [],
+                    "dbas": {
+                        "dba": []
+                    },
+                    "primaryUrl": "L3u",
+                    "nonMarketableCompany": null,
+                    "stateOrProvince": "IA3ts",
+                    "historicalIndicator": true,
+                    "doNotCallRegistry": true,
+                    "hqPhone": "62246-3-8114sAh",
+                    "companyId": 500379830576,
+                    "companyName": "HeirvoeTrs odbO",
+                    "duns": "574898524JsW"
+                },
+                "hitNumber": 7
+            },
+            {
+                "companyResults": {
+                    "country": "UdenistSa tetsqp",
+                    "city": "ontdiMewdlZpn",
+                    "sales": 633730,
+                    "locationType": "enaogciot SinLlSta",
+                    "countryId": 92507,
+                    "parentDuns": null,
+                    "ultimateParentDuns": null,
+                    "postalCode": null,
+                    "familyTreeSize": null,
+                    "address1": "4m232 Wnnhit aLia0",
+                    "exchanges": [],
+                    "dbas": {
+                        "dba": []
+                    },
+                    "primaryUrl": "aJ5",
+                    "nonMarketableCompany": null,
+                    "stateOrProvince": "PAanv",
+                    "historicalIndicator": true,
+                    "doNotCallRegistry": false,
+                    "hqPhone": "8--117790349nul",
+                    "companyId": 44733795096,
+                    "companyName": "erciv Hee SeorsrevoTUKc",
+                    "duns": "709091094mO7"
+                },
+                "hitNumber": 8
+            },
+            {
+                "companyResults": {
+                    "country": "aSnttetse iUdeSn",
+                    "city": "eBdrfdoZgy",
+                    "sales": 447.9,
+                    "locationType": "eSLogcoit nlnaicmH",
+                    "countryId": 48003,
+                    "parentDuns": null,
+                    "ultimateParentDuns": null,
+                    "postalCode": null,
+                    "familyTreeSize": null,
+                    "address1": "S34  t0NwHd",
+                    "exchanges": [],
+                    "dbas": {
+                        "dba": []
+                    },
+                    "primaryUrl": "8Hv",
+                    "nonMarketableCompany": null,
+                    "stateOrProvince": "INqwN",
+                    "historicalIndicator": true,
+                    "doNotCallRegistry": true,
+                    "hqPhone": "281147--2779T2V",
+                    "companyId": 14198130104,
+                    "companyName": "yo encoSa tCHvndr orIseYdJ",
+                    "duns": "339093088snB"
+                },
+                "hitNumber": 9
+            },
+            {
+                "companyResults": {
+                    "country": "nsettdSe tiUaMYU",
+                    "city": "Art iMnyuoNVI",
+                    "sales": 518660,
+                    "locationType": "aS lLgoieotcninBLj",
+                    "countryId": 95858,
+                    "parentDuns": null,
+                    "ultimateParentDuns": null,
+                    "postalCode": null,
+                    "familyTreeSize": null,
+                    "address1": "  RkdBd1do24rac0XkF",
+                    "exchanges": [],
+                    "dbas": {
+                        "dba": []
+                    },
+                    "primaryUrl": " rf",
+                    "nonMarketableCompany": null,
+                    "stateOrProvince": "MD8EQ",
+                    "historicalIndicator": false,
+                    "doNotCallRegistry": false,
+                    "hqPhone": "453-5604610-EIa",
+                    "companyId": 530378015887,
+                    "companyName": "suHoerR &Avritoe  soaspG F",
+                    "duns": "215149533YUJ"
+                },
+                "hitNumber": 10
+            },
+            {
+                "companyResults": {
+                    "country": "rnTeeN hastldhebmh",
+                    "city": "noEdehinvC0L",
+                    "sales": 34883126.99,
+                    "locationType": "tSiie olgcnaLnoNBX",
+                    "countryId": 26173,
+                    "parentDuns": null,
+                    "ultimateParentDuns": null,
+                    "postalCode": null,
+                    "familyTreeSize": null,
+                    "address1": "oa2o5s0ttrga H8d7",
+                    "exchanges": [],
+                    "dbas": {
+                        "dba": []
+                    },
+                    "primaryUrl": "yj9",
+                    "nonMarketableCompany": null,
+                    "stateOrProvince": "thw",
+                    "historicalIndicator": true,
+                    "doNotCallRegistry": true,
+                    "hqPhone": "990408023SSa",
+                    "companyId": 586382937596,
+                    "companyName": "PrFoSv.O eiv eso.e VerescnolHre.qco",
+                    "duns": "386768303rBM"
+                },
+                "hitNumber": 11
+            },
+            {
+                "companyResults": {
+                    "country": "nadse eitStUt79i",
+                    "city": "noyBr7Qs",
+                    "sales": 45640,
+                    "locationType": "cnotlniLaiSeg oUdM",
+                    "countryId": 68866,
+                    "parentDuns": null,
+                    "ultimateParentDuns": null,
+                    "postalCode": null,
+                    "familyTreeSize": null,
+                    "address1": "6o1a4wd 0rkDo 1OBcr",
+                    "exchanges": [],
+                    "dbas": {
+                        "dba": []
+                    },
+                    "primaryUrl": "TxD",
+                    "nonMarketableCompany": null,
+                    "stateOrProvince": "IMjdU",
+                    "historicalIndicator": true,
+                    "doNotCallRegistry": false,
+                    "hqPhone": "28--06261075XUp",
+                    "companyId": 135303989885,
+                    "companyName": "iSaow oHeLvvrse nerc 85",
+                    "duns": "411367237dcL"
+                },
+                "hitNumber": 12
+            },
+            {
+                "companyResults": {
+                    "country": "dsStUaei etntmVW",
+                    "city": "elellevBli925",
+                    "sales": 93558,
+                    "locationType": "cnLinooatgeSli du9",
+                    "countryId": 30879,
+                    "parentDuns": null,
+                    "ultimateParentDuns": null,
+                    "postalCode": null,
+                    "familyTreeSize": null,
+                    "address1": "at2t e tSS6cgi",
+                    "exchanges": [],
+                    "dbas": {
+                        "dba": []
+                    },
+                    "primaryUrl": "cIE",
+                    "nonMarketableCompany": null,
+                    "stateOrProvince": "AP I3",
+                    "historicalIndicator": true,
+                    "doNotCallRegistry": true,
+                    "hqPhone": "83-259-13773jJm",
+                    "companyId": 871498037315,
+                    "companyName": "ooHoM'sneau tGvdoi rsno 7r",
+                    "duns": "564241308TWm"
+                },
+                "hitNumber": 13
+            },
+            {
+                "companyResults": {
+                    "country": "SaentiettdUs g88",
+                    "city": "hna rciaRrogBn0G7",
+                    "sales": 97606,
+                    "locationType": "ctSolagni noiLeuNo",
+                    "countryId": 46767,
+                    "parentDuns": null,
+                    "ultimateParentDuns": null,
+                    "postalCode": null,
+                    "familyTreeSize": null,
+                    "address1": "allynSo  Rt3h9dwH 6o0bq",
+                    "exchanges": [],
+                    "dbas": {
+                        "dba": []
+                    },
+                    "primaryUrl": "yAB",
+                    "nonMarketableCompany": null,
+                    "stateOrProvince": "AP3Wa",
+                    "historicalIndicator": false,
+                    "doNotCallRegistry": false,
+                    "hqPhone": "7365--301174sVU",
+                    "companyId": 907777049953,
+                    "companyName": "Soeerwerhci svaetiWsHhvo tGy",
+                    "duns": "8058072313fa"
+                },
+                "hitNumber": 14
+            },
+            {
+                "companyResults": {
+                    "country": "etstniS ateUd2Qr",
+                    "city": "uMcnei6H7",
+                    "sales": 11.01,
+                    "locationType": " ooieltgncnSiLaCJU",
+                    "countryId": 46214,
+                    "parentDuns": null,
+                    "ultimateParentDuns": null,
+                    "postalCode": null,
+                    "familyTreeSize": null,
+                    "address1": " 00deo0#N5 9R 4w0  NbS5J",
+                    "exchanges": [],
+                    "dbas": {
+                        "dba": []
+                    },
+                    "primaryUrl": "IF2",
+                    "nonMarketableCompany": null,
+                    "stateOrProvince": "INQmI",
+                    "historicalIndicator": false,
+                    "doNotCallRegistry": true,
+                    "hqPhone": "726880-8652-s0x",
+                    "companyId": 33998144939,
+                    "companyName": "erv Pv FoL oeoHrotesyNL",
+                    "duns": "322832090BMA"
+                },
+                "hitNumber": 15
+            },
+            {
+                "companyResults": {
+                    "country": "sS Ueietadtnt4ra",
+                    "city": "uotnFl4uW",
+                    "sales": 8126,
+                    "locationType": "gSLtoainocni le8l1",
+                    "countryId": 44271,
+                    "parentDuns": null,
+                    "ultimateParentDuns": null,
+                    "postalCode": null,
+                    "familyTreeSize": null,
+                    "address1": "S Bu22 ltNff14 FmU",
+                    "exchanges": [],
+                    "dbas": {
+                        "dba": []
+                    },
+                    "primaryUrl": "mca",
+                    "nonMarketableCompany": null,
+                    "stateOrProvince": "OMn8I",
+                    "historicalIndicator": false,
+                    "doNotCallRegistry": true,
+                    "hqPhone": "5-6241072-30g7q",
+                    "companyId": 92002520088,
+                    "companyName": "soaoreargv eHGzEJ",
+                    "duns": "611928650ggq"
+                },
+                "hitNumber": 16
+            },
+            {
+                "companyResults": {
+                    "country": "f7J",
+                    "city": "NlB",
+                    "sales": 303.28,
+                    "locationType": "gioLStinoca len3X5",
+                    "countryId": null,
+                    "parentDuns": null,
+                    "ultimateParentDuns": null,
+                    "postalCode": null,
+                    "familyTreeSize": null,
+                    "address1": "W1g",
+                    "exchanges": [],
+                    "dbas": {
+                        "dba": []
+                    },
+                    "primaryUrl": "U2h",
+                    "nonMarketableCompany": null,
+                    "stateOrProvince": "Mdk",
+                    "historicalIndicator": false,
+                    "doNotCallRegistry": false,
+                    "hqPhone": "88924-608-93SiS",
+                    "companyId": 566782413990,
+                    "companyName": "doHvgeesiWrnl ooUl",
+                    "duns": "7218269724xM"
+                },
+                "hitNumber": 17
+            },
+            {
+                "companyResults": {
+                    "country": "S sneetidUtatjOg",
+                    "city": "ohbeAosrdiZ",
+                    "sales": 39700,
+                    "locationType": "noeoSLlci inagtOE2",
+                    "countryId": 41800,
+                    "parentDuns": null,
+                    "ultimateParentDuns": null,
+                    "postalCode": null,
+                    "familyTreeSize": null,
+                    "address1": "r3 9RoMo6 ed1RCX",
+                    "exchanges": [],
+                    "dbas": {
+                        "dba": []
+                    },
+                    "primaryUrl": "U3z",
+                    "nonMarketableCompany": null,
+                    "stateOrProvince": "NCxJw",
+                    "historicalIndicator": false,
+                    "doNotCallRegistry": true,
+                    "hqPhone": "-6325966-365Mr2",
+                    "companyId": 589166979464,
+                    "companyName": "onMyasoo evrrHsNo8",
+                    "duns": "173621263lLP"
+                },
+                "hitNumber": 18
+            },
+            {
+                "companyResults": {
+                    "country": "eitUn SadtsteLgg",
+                    "city": "noeDtnsFM",
+                    "sales": 679.5,
+                    "locationType": " incieotlgaoLSnUCM",
+                    "countryId": 41783,
+                    "parentDuns": null,
+                    "ultimateParentDuns": null,
+                    "postalCode": null,
+                    "familyTreeSize": null,
+                    "address1": " dkk3oCs5rneJeR99ca  Tnk",
+                    "exchanges": [],
+                    "dbas": {
+                        "dba": []
+                    },
+                    "primaryUrl": "DfL",
+                    "nonMarketableCompany": null,
+                    "stateOrProvince": "NCnOb",
+                    "historicalIndicator": true,
+                    "doNotCallRegistry": true,
+                    "hqPhone": "73465252-31-Czp",
+                    "companyId": 631839682294,
+                    "companyName": "snrshrlyvvoG aHCh eee Weucroou41",
+                    "duns": "605086335HkC"
+                },
+                "hitNumber": 19
+            },
+            {
+                "companyResults": {
+                    "country": "tsaitet ndSeUlz2",
+                    "city": "aVrneWt sZf",
+                    "sales": 3631.1,
+                    "locationType": "Sn Lgnaeiolcito1LX",
+                    "countryId": 13278,
+                    "parentDuns": null,
+                    "ultimateParentDuns": null,
+                    "postalCode": null,
+                    "familyTreeSize": null,
+                    "address1": "sr8CeetrRano25i7d n  rHgCc",
+                    "exchanges": [],
+                    "dbas": {
+                        "dba": []
+                    },
+                    "primaryUrl": "w.olioowcmvnafgweloc.vyltR",
+                    "nonMarketableCompany": null,
+                    "stateOrProvince": "OHMUh",
+                    "historicalIndicator": true,
+                    "doNotCallRegistry": true,
+                    "hqPhone": "91994-71-425w3R",
+                    "companyId": 230613002083,
+                    "companyName": "varsrge HeaooGKBX",
+                    "duns": "895672497Gso"
+                },
+                "hitNumber": 20
+            }
+        ],
+        "hits": 20,
+        "totalHits": 185,
+        "firstHit": 1,
+        "lastHit": 20
+    }
+}
+JSON
