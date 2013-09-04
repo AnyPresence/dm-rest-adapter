@@ -50,26 +50,31 @@ module DataMapperRest
       
       def parse_collection(json, model)
         array = []
+        parsed_collection = nil
         
         if @collection_selector
           selector = collection_selector_expression(model)
           DataMapper.logger.debug("Selector is #{selector.inspect}")
           path = JsonPath.new(selector)
-          DataMapper.logger.debug("Path is #{path.inspect}")
-          array = path.on(json)
-          DataMapper.logger.debug("Array is #{array.inspect}")
-          raise "Collection selector resulted in an error." if array.nil?
-          unless selector.start_with?('$..')
-            array = array.first
-          end  
+          parsed_collection = path.on(json)
+          raise "Collection selector resulted in an error." if parsed_collection.nil?          
         else
           parsed_collection = JSON.parse(json)
-          array = parsed_collection.kind_of?(Array) ? parsed_collection : [parsed_collection]
         end
+        DataMapper.logger.debug("parsed_collection is #{parsed_collection.inspect}")
+        
+        array = parsed_collection.kind_of?(Array) ? parsed_collection : [parsed_collection]  
         
         field_to_property = Hash[ properties(model).map { |p| [ p.field, p ] } ]
+        
         array.collect do |hash|
-          record_from_hash(hash, field_to_property)
+          if hash.kind_of? Array #Supports wildcard selectors that return arrays
+            hash.collect do |inner_hash|
+              record_from_hash(inner_hash, field_to_property)
+            end
+          else
+            record_from_hash(hash, field_to_property)
+          end
         end
       end
       
@@ -81,7 +86,7 @@ module DataMapperRest
           next unless property = field_to_property[field]
           record[field] = property.typecast(value)
         end
-        
+        DataMapper.logger.debug("RECORD IS #{record.inspect}")
         record
       end
 

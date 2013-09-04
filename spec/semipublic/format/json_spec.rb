@@ -143,14 +143,26 @@ describe DataMapperRest::Format::Json do
     it "loads a recordset from a string represenation using a provided selector" do
       @format.collection_selector = 'forecast.txt_forecast'
       collection = @format.parse_collection(WUNDERGROUND_JSON_COLLECTION, ForecastDay)
-      collection.should have(8).entries
+      collection.size.should == 1
+      collection.first.size.should have(8).entries
+      record = collection.first.first
+      record["period"].should == 0 
+      record["icon"].should == "partlycloudy"
+      record["icon_url"].should == "http://icons-ak.wxug.com/i/c/k/partlycloudy.gif"
+      record["pop"].should == "0"
+      record["title"].should =="Thursday"
+      record["fcttext"].should == "Partly cloudy. High of 28F. Winds from the NNW at 5 to 10 mph."
+      record["fcttext_metric"].should == "Partly cloudy. High of -2C. Winds from the NNW at 5 to 15 km/h."
     end
     
     it "loads a recordset from a flock of tweets using a provided selector" do
       @format.collection_selector = 'results'
       collection = @format.parse_collection(TWITTER_JSON_COLLECTION, Tweet)
+      collection.size.should == 1
+      collection = collection.first
       collection.should have(15).entries
-      collection[0]["id"].should == 299950023326703616
+      tweet = collection.first
+      tweet["id"].should == 299950023326703616
     end
     
     it "loads a recordset from a string using a selector that contains a dash and an underscore" do
@@ -175,8 +187,10 @@ describe DataMapperRest::Format::Json do
       
       @format.collection_selector = "response.silly_forecast.txt-forecast"
       collection = @format.parse_collection(data, ForecastDay)
+      collection.size.should == 1
+      collection = collection.first
       collection.should have(1).entries
-      record = collection[0]
+      record = collection.first
       record["period"].should == 0
   		record["icon"].should == "snow"
   		record["icon_url"].should == "http://icons-ak.wxug.com/i/c/k/snow.gif"
@@ -200,6 +214,8 @@ describe DataMapperRest::Format::Json do
       @format.collection_selector = "response.silly_forecast.txt-forecast.some-other-crazy_dash"
       collection = @format.parse_collection(data, ForecastDay)
       collection.should_not be_nil
+      collection.size.should == 1
+      collection = collection.first
       collection.should have(0).entries
     end
     
@@ -207,6 +223,8 @@ describe DataMapperRest::Format::Json do
       data = GANNETT_ARTICLES
       @format.collection_selector = "stories.[-0].xml.[0].article"
       collection = @format.parse_collection(data, Article)
+      collection.size.should == 1
+      collection = collection.first
       collection.should_not be_nil
       collection.should have(15).entries
     end
