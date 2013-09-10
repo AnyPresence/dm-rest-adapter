@@ -76,13 +76,17 @@ module DataMapperRest
             record_from_hash(hash, field_to_property)
           end
         end
+        debug_array = array.each{|e| e.inspect}.join("\n")
+        DataMapper.logger.debug("ARRAY IS\n#{debug_array}")
+
+        array
       end
       
       private
       
       def record_from_hash(hash, field_to_property)
         record = {}
-        hash.each do |field, value|
+        hash.each_pair do |field, value|
           next unless property = field_to_property[field]
           record[field] = property.typecast(value)
         end

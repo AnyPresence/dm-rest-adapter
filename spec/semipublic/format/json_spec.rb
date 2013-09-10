@@ -120,9 +120,9 @@ describe DataMapperRest::Format::Json do
     before(:each) do
       DataMapper::Logger.new($stdout,'debug')
       @format = DataMapperRest::Format::Json.new
-      @time = DateTime.new
-      @json = '[{"id":1,"created_at":"' + @time.to_s + '","title":"Testing","author":"Testy McTesty","comment_crazy_mapping":"Itzy Bitzy Spider"},' +
-        '{"id":2,"created_at":"' + @time.to_s + '","title":"Testing 2","author":"Besty McBesty"}]'
+      @time = DateTime.new.to_s
+      @json = '[{"id":1,"created_at":"' + @time + '","title":"Testing","author":"Testy McTesty","comment_crazy_mapping":"Itzy Bitzy Spider"},' +
+        '{"id":2,"created_at":"' + @time + '","title":"Testing 2","author":"Besty McBesty"}]'
     end
     
     it "loads a recordset from the string representation" do
