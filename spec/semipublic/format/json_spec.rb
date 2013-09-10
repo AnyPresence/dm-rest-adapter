@@ -229,6 +229,18 @@ describe DataMapperRest::Format::Json do
       collection.should have(15).entries
     end
     
+    it "loads a recordset from some JSON with a duplicate ID string using the provided selector" do
+      uri = URI("http://api.gannett-cdn.com/internal/MobileServices/MArticleService.svc/mcontent/v1/fronts/Home_Tablet?order=%7B%3Aid%3D%3E%3Aasc%7D&api_key=s5hw29fqnj6ay7c3atsmegxw&siteId=1&html=false")
+      res = Net::HTTP.get_response(uri)
+      data = JSON.parse(res.body)
+      @format.collection_selector = "modules.Items.content"
+      collection = @format.parse_collection(data, Article)
+      collection.size.should == 1
+      collection = collection.first
+      collection.should_not be_nil
+      collection.should have(45).entries
+    end
+    
     it "loads a recordset from a JSON string with nested array and hash properties using the provided selector" do
       data = DNBDIRECT_JSON_COLLECTION
       @format.collection_selector = ".companyResults.*"
