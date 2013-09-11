@@ -68,17 +68,10 @@ module DataMapperRest
         field_to_property = Hash[ properties(model).map { |p| [ p.field, p ] } ]
         
         array.collect do |hash|
-          if hash.kind_of? Array #Supports wildcard selectors that return arrays
-            hash.collect do |inner_hash|
-              record_from_hash(inner_hash, field_to_property)
-            end
-          else
-            record_from_hash(hash, field_to_property)
-          end
+          record_from_hash(hash, field_to_property)
         end
         debug_array = array.each{|e| e.inspect}.join("\n")
         DataMapper.logger.debug("ARRAY IS\n#{debug_array}")
-
         array
       end
       
@@ -86,7 +79,7 @@ module DataMapperRest
       
       def record_from_hash(hash, field_to_property)
         record = {}
-        hash.each_pair do |field, value|
+        hash.each do |field, value|
           next unless property = field_to_property[field]
           record[field] = property.typecast(value)
         end
