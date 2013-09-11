@@ -56,11 +56,20 @@ module DataMapperRest
           selector = collection_selector_expression(model)
           DataMapper.logger.debug("Selector is #{selector.inspect}")
           path = JsonPath.new(selector)
+          DataMapper.logger.debug("Selector path is #{path.inspect}")
           parsed_collection = path.on(json)
-          raise "Collection selector resulted in an error." if parsed_collection.nil?          
+          DataMapper.logger.debug("Parsed collection is\n#{parsed_collection.inspect}")
+          raise "Collection selector resulted in an error." if parsed_collection.nil?
+          
+          if parsed_collection.kind_of?(Array) && parsed_collection.size == 1 #Handles case where a star selector is used
+            parsed_collection = parsed_collection.first
+            DataMapper.logger.debug("Reset parsed collection to #{parsed_collection.inspect}")
+          end
+          
         else
           parsed_collection = JSON.parse(json)
         end
+        
         DataMapper.logger.debug("parsed_collection is #{parsed_collection.inspect}")
         
         array = parsed_collection.kind_of?(Array) ? parsed_collection : [parsed_collection]  
@@ -70,8 +79,9 @@ module DataMapperRest
         array.collect do |hash|
           record_from_hash(hash, field_to_property)
         end
-        debug_array = array.each{|e| e.inspect}.join("\n")
-        DataMapper.logger.debug("ARRAY IS\n#{debug_array}")
+        
+        DataMapper.logger.debug("ARRAY IS\n#{array.inspect}")
+        
         array
       end
       
@@ -79,7 +89,7 @@ module DataMapperRest
       
       def record_from_hash(hash, field_to_property)
         record = {}
-        hash.each do |field, value|
+        hash.each_pair do |field, value|
           next unless property = field_to_property[field]
           record[field] = property.typecast(value)
         end

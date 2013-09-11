@@ -143,9 +143,8 @@ describe DataMapperRest::Format::Json do
     it "loads a recordset from a string represenation using a provided selector" do
       @format.collection_selector = 'forecast.txt_forecast'
       collection = @format.parse_collection(WUNDERGROUND_JSON_COLLECTION, ForecastDay)
-      collection.size.should == 1
-      collection.first.size.should have(8).entries
-      record = collection.first.first
+      collection.should have(8).entries
+      record = collection.first
       record["period"].should == 0 
       record["icon"].should == "partlycloudy"
       record["icon_url"].should == "http://icons-ak.wxug.com/i/c/k/partlycloudy.gif"
@@ -158,8 +157,6 @@ describe DataMapperRest::Format::Json do
     it "loads a recordset from a flock of tweets using a provided selector" do
       @format.collection_selector = 'results'
       collection = @format.parse_collection(TWITTER_JSON_COLLECTION, Tweet)
-      collection.size.should == 1
-      collection = collection.first
       collection.should have(15).entries
       tweet = collection.first
       tweet["id"].should == 299950023326703616
@@ -185,10 +182,9 @@ describe DataMapperRest::Format::Json do
 	  }
     JSON
       
-      @format.collection_selector = "response.silly_forecast.txt-forecast"
+      @format.collection_selector = "response.silly_forecast.txt-forecast[0]"
       collection = @format.parse_collection(data, ForecastDay)
       collection.size.should == 1
-      collection = collection.first
       collection.should have(1).entries
       record = collection.first
       record["period"].should == 0
@@ -214,8 +210,6 @@ describe DataMapperRest::Format::Json do
       @format.collection_selector = "response.silly_forecast.txt-forecast.some-other-crazy_dash"
       collection = @format.parse_collection(data, ForecastDay)
       collection.should_not be_nil
-      collection.size.should == 1
-      collection = collection.first
       collection.should have(0).entries
     end
     
@@ -223,8 +217,6 @@ describe DataMapperRest::Format::Json do
       data = GANNETT_ARTICLES
       @format.collection_selector = "stories.[-0].xml.[0].article"
       collection = @format.parse_collection(data, Article)
-      collection.size.should == 1
-      collection = collection.first
       collection.should_not be_nil
       collection.should have(15).entries
     end
@@ -235,10 +227,8 @@ describe DataMapperRest::Format::Json do
       data = JSON.parse(res.body)
       @format.collection_selector = "modules.Items.content"
       collection = @format.parse_collection(data, Article)
-      collection.size.should == 1
-      collection = collection.first
       collection.should_not be_nil
-      collection.should have(45).entries
+      collection.should have(44).entries
     end
     
     it "loads a recordset from a JSON string with nested array and hash properties using the provided selector" do
