@@ -6,13 +6,16 @@ SOURCE       = ENV.fetch('SOURCE', :git).to_sym
 REPO_POSTFIX = SOURCE == :path ? ''                                : '.git'
 DATAMAPPER   = SOURCE == :path ? Pathname(__FILE__).dirname.parent : 'http://github.com/datamapper'
 DM_VERSION   = '~> 1.2.0'
+JSON_VERSION = '~> 1.8'
+JSONPATH_VERSION = '~> 0.5.4'
+REST_CLIENT_VERSION = '~> 1.6'
 
 gem 'dm-serializer', DM_VERSION, SOURCE => "#{DATAMAPPER}/dm-serializer#{REPO_POSTFIX}", :branch => "release-1.2"
 
-gem 'multi_json',  '~> 1.3.2'
-gem 'json',        '>= 1.4.6'
-gem 'json_pure',   '>= 1.4.6'
-gem 'jsonpath', '~> 0.5.1'
+gem 'multi_json',  JSON_VERSION
+gem 'json',        JSON_VERSION
+gem 'json_pure',   JSON_VERSION
+gem 'jsonpath', JSONPATH_VERSION
 
 group :development do
 
@@ -36,7 +39,7 @@ end
 group :datamapper do
 
   gem 'dm-core',      DM_VERSION, SOURCE => "#{DATAMAPPER}/dm-core#{REPO_POSTFIX}", :branch => "release-1.2"
-  gem 'rest-client',  '~> 1.6.3'
+  gem 'rest-client',  REST_CLIENT_VERSION
 
   plugins = ENV['PLUGINS'] || ENV['PLUGIN']
   plugins = plugins.to_s.tr(',', ' ').split.uniq
