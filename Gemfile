@@ -40,6 +40,7 @@ group :datamapper do
 
   gem 'dm-core',      DM_VERSION, SOURCE => "#{DATAMAPPER}/dm-core#{REPO_POSTFIX}", :branch => "release-1.2"
   gem 'rest-client',  REST_CLIENT_VERSION
+  gem 'oauth', :git => "git://github.com/galois17/oauth-ruby.git", :branch => "add-rest-client"
 
   plugins = ENV['PLUGINS'] || ENV['PLUGIN']
   plugins = plugins.to_s.tr(',', ' ').split.uniq
@@ -49,3 +50,13 @@ group :datamapper do
   end
 
 end
+
+group :test do
+  gem 'rspec', '~> 1.3.2'
+  gem 'rspec-core', '2.11.1'
+  gem 'rspec-mocks', '2.11.3'
+  gem 'rspec-expectations', '2.11.3'
+  gem 'debugger', '1.5.0'
+  gem 'webmock'
+end
+  

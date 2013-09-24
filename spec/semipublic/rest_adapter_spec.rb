@@ -17,6 +17,7 @@ describe DataMapper::Adapters::RestAdapter do
       :enable_form_urlencoded_submission => true
     }])
     @adapter.rest_client = double("rest_client")
+    @adapter.rest_client.stub(:url) { "http://example.com"}
 
     @response = double("response")
 
@@ -78,6 +79,7 @@ describe DataMapper::Adapters::RestAdapter do
       @legacy_response.stub(:code) {200}
       @legacy_response.stub(:body) {""}
       @legacy_adapter.rest_client = double("rest_client")
+      @legacy_adapter.rest_client.stub(:url) { "http://example.com"}
       @legacy_adapter.rest_client.stub(:[]) { @legacy_adapter.rest_client }
       @legacy_adapter.rest_client.stub(:get) {@legacy_response}
       @legacy_adapter.rest_client.stub(:post) {@legacy_response}
@@ -501,10 +503,12 @@ describe DataMapper::Adapters::RestAdapter do
     describe "#read" do
       it "should fetch the resource by passing the key as a query parameter" do
         @format.should_receive(:resource_path).with({ :model => "chapters" })
-        @adapter.rest_client.should_receive(:get).with(
+        rest_client = double("rest_client")
+        @adapter.rest_client.should_receive(:[]).and_return(rest_client)
+        rest_client.should_receive(:get).with(
           {:accept=>"application/mock", :api_key=>"HumptyDumpty", :params=>{:order=>{:id=>:asc}, :book_id=>1}}
         ).and_return(@response)
-        stub_mocks!
+        stub_read_mocks!(rest_client)
         @adapter.read(@query)
       end
     end
@@ -610,7 +614,86 @@ describe DataMapper::Adapters::RestAdapter do
     end
   end
   
+  describe "authenticate using omniauth version 1" do
+    
+    before(:each) do
+      @format = double("format")
+      @format.stub(:extension=)
+      @format.stub(:accept).and_return("text/json")
+      
+      @adapter = DataMapper::Adapters::RestAdapter.new(:test, DataMapper::Mash[{
+        :scheme   => "https",
+        :host     => "test.tld",
+        :port     => 81,
+        :user     => "admin",
+        :password => "secret",
+        :format   => @format,
+        :extension => "test",
+        :use_omniauth_ver_1 => true,
+        :omniauth_ver_1_consumer_key => "12345",
+        :omniauth_ver_1_private_key => FAKE_PRIVATE_KEY,
+        :disable_format_extension_in_request_url => true,
+        :enable_form_urlencoded_submission => true
+      }])
+    end
+    
+    describe "#read" do
+      context "with unscoped query" do
+        before(:each) do
+          @query = Book.all.query
+          @resources = [ {} ]
+          # @format.should_receive(:accept).and_return("application/mock")
+        end
+
+        it "should authenticate with omniauth" do
+          @format.should_receive(:resource_path).with({:model => "livre"})
+          rest_client = double("rest_client")
+          @adapter.rest_client.should_receive(:[]).and_return(rest_client)
+          rest_client.should_receive(:get).with do |*args|
+            options = args.pop
+            p options.to_s
+            
+            options[:accept].should == "text/json"         
+            options["Authorization"].to_s.should =~ /oauth_signature_method="RSA-SHA1"/
+            options["Authorization"].to_s.should =~ /oauth_consumer_key="12345"/
+            options["Authorization"].to_s.should =~ /oauth_signature=".+?"/
+          end.and_return(@response)
+
+          stub_read_mocks!(rest_client)
+
+          @adapter.read(@query)
+        end
+      end
+    end
+  end
+  
+  def stub_read_mocks!(rest_client = nil)
+    rest_client = rest_client || double("rest_client")
+    stub_mocks!
+    stub_formats!
+    stub_codes!
+    
+    @adapter.rest_client.stub(:[]).and_return(rest_client)
+    rest_client.stub(:url).and_return("http://example.com")
+    rest_client.stub(:get).and_return(@response)
+  end
+  
   def stub_mocks!
+    stub_formats!
+    
+    {
+      :[] => @adapter.rest_client,
+      :get => @response,
+      :post => @response,
+      :put => @response,
+      :delete => @response,
+      :url => "http://example.com"
+    }.each_pair { |meth, ret| @adapter.rest_client.stub(meth) { ret } unless @adapter.rest_client.respond_to?(meth) }
+
+    stub_codes!
+  end
+  
+  def stub_formats!
     {
       :resource_path => "mock",
       :mime => "application/mock",
@@ -618,16 +701,10 @@ describe DataMapper::Adapters::RestAdapter do
       :update_attributes => double(),
       :parse_collection => [],
       :parse_record => double()
-    }.each_pair { |meth, ret| @format.stub(meth) { ret } unless @format.respond_to?(meth) }
-
-    {
-      :[] => @adapter.rest_client,
-      :get => @response,
-      :post => @response,
-      :put => @response,
-      :delete => @response,
-    }.each_pair { |meth, ret| @adapter.rest_client.stub(meth) { ret } unless @adapter.rest_client.respond_to?(meth) }
-
+    }.each_pair { |meth, ret| @format.stub(meth) { ret } unless @format.respond_to?(meth) }    
+  end
+  
+  def stub_codes!
     {
       :code => 200,
       :body => ""

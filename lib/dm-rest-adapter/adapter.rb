@@ -1,3 +1,6 @@
+require 'oauth'
+require 'oauth/request_proxy/rest_client_request'
+
 module DataMapperRest
   # TODO: Specs for resource format parse errors (existing bug)
 
@@ -53,8 +56,10 @@ module DataMapperRest
           path = @format.resource_path(*path_items)
           
           @log.debug("About to GET using #{path}")
-          
-          response = @rest_client[path].get(create_headers())
+          target = @rest_client[path]
+          req = ::RestClient::Request.new(url: target.url, method: :get, headers: {}) 
+          req = ::DataMapperRest::Authentication.setup_auth(req, @options)
+          response = target.get(req.headers.merge(create_headers()))
           
           @log.debug("Response to GET was #{response.inspect}")
           
@@ -73,7 +78,11 @@ module DataMapperRest
         
         @log.debug("About to GET using #{path} with query_options of #{query_options.inspect}")
         
-        response = @rest_client[path].get(query_options)
+        target = @rest_client[path]
+        req = ::RestClient::Request.new(url: target.url, method: :get, headers: {})
+        req = ::DataMapperRest::Authentication.setup_auth(req, @options)
+        
+        response = target.get(req.headers.merge(query_options))
         
         @log.debug("Response to GET was #{response.code} #{response.body}")
         records = @format.parse_collection(response.body, model)
@@ -197,6 +206,14 @@ module DataMapperRest
         
         @log.info("Will use extra HTTP headers: #{@extra_headers.inspect}")
         @log.warn("'Content-Type' will always be set to '#{@extra_headers[:content_type]}'. Please ensure that's exactly what you intended!") if @extra_headers.has_key?(:content_type)
+      end
+      
+      if @options[:use_omniauth_ver_1]
+        @log.info("Configured for omniauth version 1");
+        private_key = @options[:omniauth_ver_1_private_key]
+        consumer_key = @options[:omniauth_ver_1_consumer_key] || ""
+        site = @options[:omniauth_ver_1_site] || ""
+        @omniauth_ver_1_consumer = ::OAuth::Consumer.new(consumer_key, private_key, :site => site)
       end
       
       @log.info("Will use form URL encoded submission for POST and PUT calls.")if @options[:enable_form_urlencoded_submission]

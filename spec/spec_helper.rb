@@ -1,5 +1,6 @@
 require 'rubygems'
 require 'pathname'
+require 'webmock'
 
 # Support running specs with 'rake spec' and 'spec'
 $LOAD_PATH.unshift('lib') unless $LOAD_PATH.include?('lib')
