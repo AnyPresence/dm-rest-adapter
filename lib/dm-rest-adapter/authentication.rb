@@ -2,7 +2,7 @@ module DataMapperRest
   module Authentication
    
     def self.setup_auth(req, options)
-      if options[:use_omniauth_ver_1]
+      if options[:auth_scheme] == "omniauth_ver_1"
         omni = ::DataMapper::Authentication::OmniauthVer1.new(options)
         return omni.setup(req)
       end

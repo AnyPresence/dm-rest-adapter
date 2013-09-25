@@ -208,7 +208,7 @@ module DataMapperRest
         @log.warn("'Content-Type' will always be set to '#{@extra_headers[:content_type]}'. Please ensure that's exactly what you intended!") if @extra_headers.has_key?(:content_type)
       end
             
-      @log.info("Configured for omniauth version 1") if @options[:use_omniauth_ver_1]
+      @log.info("Configured for omniauth version 1") if options[:auth_scheme] == "omniauth_ver_1"
       
       @log.info("Will use form URL encoded submission for POST and PUT calls.")if @options[:enable_form_urlencoded_submission]
       
