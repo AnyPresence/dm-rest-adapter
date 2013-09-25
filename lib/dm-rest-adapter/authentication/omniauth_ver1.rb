@@ -9,12 +9,16 @@ module DataMapper
       
       def initialize(options)
         @options = options
+        private_key = @options[:omniauth_ver_1_private_key]
+        consumer_key = @options[:omniauth_ver_1_consumer_key] || ""
+        site = @options[:omniauth_ver_1_site] || ""
+        @omniauth_ver_1_consumer = ::OAuth::Consumer.new(consumer_key.strip, private_key.strip, :site => site)
       end
       
       def setup(req)
         token_secret = @options[:omniauth_ver_1_token_secret] || ""
         token = @options[:omniauth_ver_1_token] || ""
-        access_token = OAuth::ConsumerToken.from_hash(@omniauth_ver_1_consumer, {oauth_token_secret: token_secret, oauth_token: token})
+        access_token = OAuth::ConsumerToken.from_hash(@options[:omniauth_ver_1_consumer], {oauth_token_secret: token_secret, oauth_token: token})
         signature_method = @options[:omniauth_ver_1_signature_method] || "RSA-SHA1"
         oauth_params = {:signature_method => signature_method, :token => access_token, :consumer => @omniauth_ver_1_consumer}      
         oauth_helper = OAuth::Client::Helper.new(req, oauth_params.merge(:request_uri => req.url))

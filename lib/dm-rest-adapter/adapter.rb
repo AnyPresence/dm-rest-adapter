@@ -207,14 +207,8 @@ module DataMapperRest
         @log.info("Will use extra HTTP headers: #{@extra_headers.inspect}")
         @log.warn("'Content-Type' will always be set to '#{@extra_headers[:content_type]}'. Please ensure that's exactly what you intended!") if @extra_headers.has_key?(:content_type)
       end
-      
-      if @options[:use_omniauth_ver_1]
-        @log.info("Configured for omniauth version 1");
-        private_key = @options[:omniauth_ver_1_private_key]
-        consumer_key = @options[:omniauth_ver_1_consumer_key] || ""
-        site = @options[:omniauth_ver_1_site] || ""
-        @omniauth_ver_1_consumer = ::OAuth::Consumer.new(consumer_key, private_key, :site => site)
-      end
+            
+      @log.info("Configured for omniauth version 1") if @options[:use_omniauth_ver_1]
       
       @log.info("Will use form URL encoded submission for POST and PUT calls.")if @options[:enable_form_urlencoded_submission]
       
