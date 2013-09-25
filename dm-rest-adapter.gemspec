@@ -61,10 +61,11 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<multi_json>, ["~> 1.8"])
       s.add_runtime_dependency(%q<json>, ["~> 1.8"])
       s.add_runtime_dependency(%q<json_pure>, ["~> 1.8"])
+      s.add_runtime_dependency "oauth", :git => "git://github.com/galois17/oauth-ruby.git", :branch => "add-rest-client"
       s.add_development_dependency(%q<dm-validations>, ["~> 1.2.0"])
       s.add_development_dependency(%q<jeweler>, ["~> 1.8.4"])
       s.add_development_dependency(%q<rake>, ["~> 0.9.2"])
-      s.add_development_dependency(%q<rspec>, ["~> 1.3.2"])
+      s.add_development_dependency(%q<rspec>, ["~> 1.3.2"])        
     else
       s.add_dependency(%q<dm-serializer>, ["~> 1.2.0"])
       s.add_dependency(%q<multi_json>, ["~> 1.8"])
@@ -74,6 +75,7 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<jeweler>, ["~> 1.8.4"])
       s.add_dependency(%q<rake>, ["~> 0.9.2"])
       s.add_dependency(%q<rspec>, ["~> 1.3.2"])
+      s.add_dependency "oauth", :git => "git://github.com/galois17/oauth-ruby.git", :branch => "add-rest-client"
     end
   else
     s.add_dependency(%q<dm-serializer>, ["~> 1.2.0"])
@@ -84,6 +86,7 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<jeweler>, ["~> 1.8.4"])
     s.add_dependency(%q<rake>, ["~> 0.9.2"])
     s.add_dependency(%q<rspec>, ["~> 1.3.2"])
+    s.add_dependency "oauth", :git => "git://github.com/galois17/oauth-ruby.git", :branch => "add-rest-client"
   end
 end
 
