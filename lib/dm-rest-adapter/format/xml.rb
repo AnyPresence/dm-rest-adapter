@@ -93,11 +93,7 @@ module DataMapperRest
         array_selector = build_array_selector(array_property_name)
         REXML::Document::new(array_element).elements.collect(array_selector) do |entity_element|
           hash = Hash.new
-          entity_element.elements.map do |element|
-            field = element.name.to_s.tr('-', '_')
-            value = element.text
-            hash[snake_case(field)] = value
-          end
+          hash = walk_elements(entity_element)
           objects << hash
         end
         objects
@@ -112,6 +108,36 @@ module DataMapperRest
           "id"
         else
           camel.gsub(/(.)([A-Z])/,'\1_\2').downcase
+        end
+      end
+      
+      # Walk down an XML tree starting at the entity_element and gobble up entities
+      # to build a nested hash.
+      def walk_elements(entity_element)        
+        _hash = Hash.new
+
+        if !entity_element.is_a?(REXML::Elements) && entity_element.respond_to?(:has_elements?)
+          entity_element.elements.map do |element|
+            do_walk(_hash, element)
+          end
+        end
+
+        if entity_element.is_a?(REXML::Elements)
+          entity_element.map do |element|
+            do_walk(_hash, element)
+          end
+        end
+
+        _hash
+      end
+      
+      def do_walk(hash, element)
+        field = element.name.to_s.tr('-', '_')
+        value = element.has_text? ? element.text : ""
+        if element.respond_to?(:has_elements?) && element.has_elements?
+          hash[snake_case(field)] = walk_elements(element.elements)
+        else
+          hash[snake_case(field)] = value
         end
       end
     end
