@@ -100,7 +100,7 @@ module DataMapperRest
       end
       
       def build_array_selector(array_property_name)
-        "//#{DataMapper::Inflector.pluralize(array_property_name)}/#{DataMapper::Inflector.singularize(array_property_name)}"
+        "/#{DataMapper::Inflector.pluralize(array_property_name)}/#{DataMapper::Inflector.singularize(array_property_name)}|/#{DataMapper::Inflector.singularize(array_property_name)}"
       end
       
       def snake_case(camel) 

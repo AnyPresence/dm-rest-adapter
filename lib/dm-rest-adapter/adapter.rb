@@ -1,5 +1,6 @@
 require 'oauth'
 require 'oauth/request_proxy/rest_client_request'
+require "addressable/uri"
 
 module DataMapperRest
   # TODO: Specs for resource format parse errors (existing bug)
@@ -75,14 +76,16 @@ module DataMapperRest
         query_options[:params] = params unless params.empty?
         
         path = @format.resource_path(*path_items)
-        
+        path = "#{path}?#{extract_query_string(params)}"
         @log.debug("About to GET using #{path} with query_options of #{query_options.inspect}")
         
         target = @rest_client[path]
         req = ::RestClient::Request.new(url: target.url, method: :get, headers: {})
         req = ::DataMapperRest::Authentication.setup_auth(req, @options)
         
-        response = target.get(req.headers.merge(query_options))
+        headers = req.headers.merge(query_options.delete(:params))
+        
+        response = target.get(headers)
         
         @log.debug("Response to GET was #{response.code} #{response.body}")
         records = @format.parse_collection(response.body, model)
@@ -367,6 +370,21 @@ module DataMapperRest
         @log.debug("Adding REST client debugging proxy")
         RestClient.log =  $stdout
       end
+    end
+    
+    def extract_query_string(query)
+      uri = Addressable::URI.new
+      params = prune_query_string_for_omniauth(query)
+      uri.query_values = params
+      uri.query
+    end
+    
+    def prune_query_string_for_omniauth(query)
+      params = {}
+      query.each_pair do |k,v|
+        params[k] = v if v.is_a?(String) || v.is_a?(Symbol)
+      end
+      params
     end
     
   end
