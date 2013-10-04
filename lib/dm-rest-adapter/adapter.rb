@@ -76,15 +76,23 @@ module DataMapperRest
         query_options[:params] = params unless params.empty?
         
         path = @format.resource_path(*path_items)
-        path = "#{path}?#{extract_query_string(params)}"
+        extracted_query_string = extract_query_string(params)
+        path = extracted_query_string.empty? ? path : "#{path}?#{extract_query_string(params)}"
         @log.debug("About to GET using #{path} with query_options of #{query_options.inspect}")
         
         target = @rest_client[path]
         req = ::RestClient::Request.new(url: target.url, method: :get, headers: {})
         req = ::DataMapperRest::Authentication.setup_auth(req, @options)
         
-        headers = req.headers.merge(query_options.delete(:params))
-        
+        # Tweak header
+        headers = {}
+        if @options[:auth_scheme] == "omniauth_ver_1"
+          params = query_options.delete(:params)        
+          headers = req.headers.merge(params)
+        else
+          headers = query_options
+        end
+    
         response = target.get(headers)
         
         @log.debug("Response to GET was #{response.code} #{response.body}")
@@ -211,7 +219,7 @@ module DataMapperRest
         @log.warn("'Content-Type' will always be set to '#{@extra_headers[:content_type]}'. Please ensure that's exactly what you intended!") if @extra_headers.has_key?(:content_type)
       end
             
-      @log.info("Configured for omniauth version 1") if options[:auth_scheme] == "omniauth_ver_1"
+      @log.info("Configured for omniauth version 1") if @options[:auth_scheme] == "omniauth_ver_1"
       
       @log.info("Will use form URL encoded submission for POST and PUT calls.")if @options[:enable_form_urlencoded_submission]
       
@@ -374,15 +382,15 @@ module DataMapperRest
     
     def extract_query_string(query)
       uri = Addressable::URI.new
-      params = prune_query_string_for_omniauth(query)
+      params = prune_query_string(query)
       uri.query_values = params
       uri.query
     end
     
-    def prune_query_string_for_omniauth(query)
+    def prune_query_string(query)
       params = {}
       query.each_pair do |k,v|
-        params[k] = v if v.is_a?(String) || v.is_a?(Symbol)
+        params[k] = v if v.is_a?(String) || v.is_a?(Symbol) || v.is_a?(Numeric)
       end
       params
     end

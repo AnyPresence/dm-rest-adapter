@@ -314,7 +314,7 @@ describe DataMapper::Adapters::RestAdapter do
 
       it "should query the resource path" do
         @format.stub(:resource_path) { "books.mock" }
-        @adapter.rest_client.should_receive(:[]).with("books.mock").and_return(@adapter.rest_client)
+        @adapter.rest_client.should_receive(:[]).with("books.mock?author=Dan%20Kubb&comment_crazy_mapping=garbage").and_return(@adapter.rest_client)
         stub_mocks!
         @adapter.read(@query)
       end
@@ -505,6 +505,7 @@ describe DataMapper::Adapters::RestAdapter do
         @format.should_receive(:resource_path).with({ :model => "chapters" })
         rest_client = double("rest_client")
         @adapter.rest_client.should_receive(:[]).and_return(rest_client)
+
         rest_client.should_receive(:get).with(
           {:accept=>"application/mock", :api_key=>"HumptyDumpty", :params=>{:order=>{:id=>:asc}, :book_id=>1}}
         ).and_return(@response)
@@ -629,7 +630,7 @@ describe DataMapper::Adapters::RestAdapter do
         :password => "secret",
         :format   => @format,
         :extension => "test",
-        :use_omniauth_ver_1 => true,
+        :auth_scheme => "omniauth_ver_1",
         :omniauth_ver_1_consumer_key => "12345",
         :omniauth_ver_1_private_key => FAKE_PRIVATE_KEY,
         :disable_format_extension_in_request_url => true,
@@ -642,7 +643,7 @@ describe DataMapper::Adapters::RestAdapter do
         before(:each) do
           @query = Book.all.query
           @resources = [ {} ]
-          # @format.should_receive(:accept).and_return("application/mock")
+          @format.should_receive(:accept).and_return("application/mock")
         end
 
         it "should authenticate with omniauth" do
@@ -650,10 +651,8 @@ describe DataMapper::Adapters::RestAdapter do
           rest_client = double("rest_client")
           @adapter.rest_client.should_receive(:[]).and_return(rest_client)
           rest_client.should_receive(:get).with do |*args|
-            options = args.pop
-            p options.to_s
-            
-            options[:accept].should == "text/json"         
+            options = args.pop            
+                    
             options["Authorization"].to_s.should =~ /oauth_signature_method="RSA-SHA1"/
             options["Authorization"].to_s.should =~ /oauth_consumer_key="12345"/
             options["Authorization"].to_s.should =~ /oauth_signature=".+?"/
