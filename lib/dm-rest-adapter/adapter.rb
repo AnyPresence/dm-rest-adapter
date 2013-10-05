@@ -60,7 +60,10 @@ module DataMapperRest
           target = @rest_client[path]
           req = ::RestClient::Request.new(url: target.url, method: :get, headers: {}) 
           req = ::DataMapperRest::Authentication.setup_auth(req, @options)
-          response = target.get(req.headers.merge(create_headers()))
+          
+          headers = finalize_header(req, create_headers)
+          
+          response = target.get(headers)
           
           @log.debug("Response to GET was #{response.inspect}")
           
@@ -84,14 +87,7 @@ module DataMapperRest
         req = ::RestClient::Request.new(url: target.url, method: :get, headers: {})
         req = ::DataMapperRest::Authentication.setup_auth(req, @options)
         
-        # Tweak header
-        headers = {}
-        if @options[:auth_scheme] == "omniauth_ver_1"
-          params = query_options.delete(:params)        
-          headers = req.headers.merge(params)
-        else
-          headers = query_options
-        end
+        headers = finalize_header(req, query_options)
     
         response = target.get(headers)
         
@@ -393,6 +389,17 @@ module DataMapperRest
         params[k] = v if v.is_a?(String) || v.is_a?(Symbol) || v.is_a?(Numeric)
       end
       params
+    end
+    
+    def finalize_header(req, headers)
+      _headers = {}
+      if @options[:auth_scheme] == "omniauth_ver_1"
+        params = headers.delete(:params)        
+        _headers = req.headers.merge(params)
+      else
+        _headers = headers
+      end
+      _headers
     end
     
   end
