@@ -207,8 +207,16 @@ module DataMapperRest
       
       if @options[:extra_http_headers]
         @extra_headers = Hash.new 
-        @options[:extra_http_headers].each do |key, value| 
-          @extra_headers[key.to_sym] = value
+        if @options[:extra_http_headers].is_a?(Hash)          
+          @options[:extra_http_headers].each do |key, value| 
+            @extra_headers[key.to_sym] = value
+          end
+        else
+          begin
+            @extra_headers = JSON.parse(@options[:extra_http_headers])
+          rescue
+            # Invalid json
+          end
         end
         
         @log.info("Will use extra HTTP headers: #{@extra_headers.inspect}")

@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 describe DataMapper::Adapters::RestAdapter do
+  
   before(:each) do
     @format = double("format")
     
@@ -125,6 +126,55 @@ describe DataMapper::Adapters::RestAdapter do
     it "should ask the format for the path to each Model" do
       @legacy_format.should_receive(:resource_path).with(:model => 'Store__c')
       @legacy_adapter.create([@store1])
+    end
+    
+    it "be able to parse extra headers as hash" do
+      format = double("format")
+      adapter = DataMapper::Adapters::RestAdapter.new(:test, DataMapper::Mash[{
+        :host     => "test.tld",
+        :port     => 81,
+        :user     => "admin",
+        :password => "secret",
+        :format   => format,
+        :limit_param_name => 'unlimited',
+        :offset_param_name => 'nuffsaid',
+        :logging_level => 'debug',
+        :extra_http_headers => {:api_key => "HumptyDumpty"},
+        :enable_form_urlencoded_submission => true
+      }])
+      adapter.rest_client = double("rest_client")
+      adapter.rest_client.stub(:url) { "http://example.com"}
+
+      response = double("response")
+
+      DataMapper.setup(adapter)
+      
+      adapter.instance_variable_get("@extra_headers")[:api_key].should == "HumptyDumpty"
+    end
+    
+    it "be able to parse extra headers as string" do
+      format = double("format")
+      headers = {:api_key => "HumptyDumpty"}.to_json
+      adapter = DataMapper::Adapters::RestAdapter.new(:test, DataMapper::Mash[{
+        :host     => "test.tld",
+        :port     => 81,
+        :user     => "admin",
+        :password => "secret",
+        :format   => format,
+        :limit_param_name => 'unlimited',
+        :offset_param_name => 'nuffsaid',
+        :logging_level => 'debug',
+        :extra_http_headers => headers,
+        :enable_form_urlencoded_submission => true
+      }])
+      adapter.rest_client = double("rest_client")
+      adapter.rest_client.stub(:url) { "http://example.com"}
+
+      response = double("response")
+
+      DataMapper.setup(adapter)
+      
+      adapter.instance_variable_get("@extra_headers").should_not be_empty
     end
     
   end
