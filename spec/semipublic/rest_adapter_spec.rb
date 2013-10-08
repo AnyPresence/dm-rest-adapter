@@ -145,10 +145,7 @@ describe DataMapper::Adapters::RestAdapter do
       adapter.rest_client = double("rest_client")
       adapter.rest_client.stub(:url) { "http://example.com"}
 
-      response = double("response")
-
-      DataMapper.setup(adapter)
-      
+      DataMapper.setup(adapter)      
       adapter.instance_variable_get("@extra_headers")[:api_key].should == "HumptyDumpty"
     end
     
@@ -170,11 +167,8 @@ describe DataMapper::Adapters::RestAdapter do
       adapter.rest_client = double("rest_client")
       adapter.rest_client.stub(:url) { "http://example.com"}
 
-      response = double("response")
-
-      DataMapper.setup(adapter)
-      
-      adapter.instance_variable_get("@extra_headers").should_not be_empty
+      DataMapper.setup(adapter)      
+      adapter.instance_variable_get("@extra_headers")[:api_key].should == "HumptyDumpty"
     end
     
   end

@@ -206,7 +206,7 @@ module DataMapperRest
       end
       
       if @options[:extra_http_headers]
-        @extra_headers = Hash.new 
+        @extra_headers = Hash.new
         if @options[:extra_http_headers].is_a?(Hash)          
           @options[:extra_http_headers].each do |key, value| 
             @extra_headers[key.to_sym] = value
@@ -214,6 +214,7 @@ module DataMapperRest
         else
           begin
             @extra_headers = JSON.parse(@options[:extra_http_headers])
+            @extra_headers = Hash[@extra_headers.map{ |k, v| [k.to_sym, v] }]
           rescue
             # Invalid json
           end
