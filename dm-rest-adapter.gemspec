@@ -26,6 +26,8 @@ Gem::Specification.new do |s|
     "lib/dm-rest-adapter.rb",
     "lib/dm-rest-adapter/adapter.rb",
     "lib/dm-rest-adapter/exceptions.rb",
+    "lib/dm-rest-adapter/authentication/omniauth_ver1.rb",
+    "lib/dm-rest-adapter/helper/query_param.rb",
     "lib/dm-rest-adapter/format.rb",
     "lib/dm-rest-adapter/format/json.rb",
     "lib/dm-rest-adapter/format/xml.rb",

@@ -15,6 +15,7 @@ require 'dm-rest-adapter/format/json'
 require 'dm-rest-adapter/exceptions'
 require 'dm-rest-adapter/authentication'
 require 'dm-rest-adapter/authentication/omniauth_ver1'
+require 'dm-rest-adapter/helper/query_param'
 
 DataMapper::Adapters::RestAdapter = DataMapperRest::Adapter
 DataMapper::Associations::Relationship::OPTIONS << :nested

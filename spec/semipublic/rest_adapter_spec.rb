@@ -1,22 +1,25 @@
 require 'spec_helper'
 
+def default_settings
+  {
+    :host     => "test.tld",
+    :port     => 81,
+    :user     => "admin",
+    :password => "secret",
+    :limit_param_name => 'unlimited',
+    :offset_param_name => 'nuffsaid',
+    :logging_level => 'debug',
+    :extra_http_headers => {:api_key => "HumptyDumpty"},
+    :enable_form_urlencoded_submission => true
+  }
+end
+
 describe DataMapper::Adapters::RestAdapter do
   
   before(:each) do
     @format = double("format")
-    
-    @adapter = DataMapper::Adapters::RestAdapter.new(:test, DataMapper::Mash[{
-      :host     => "test.tld",
-      :port     => 81,
-      :user     => "admin",
-      :password => "secret",
-      :format   => @format,
-      :limit_param_name => 'unlimited',
-      :offset_param_name => 'nuffsaid',
-      :logging_level => 'debug',
-      :extra_http_headers => {:api_key => "HumptyDumpty"},
-      :enable_form_urlencoded_submission => true
-    }])
+
+    @adapter = DataMapper::Adapters::RestAdapter.new(:test, DataMapper::Mash[default_settings.merge(format: @format)])
     @adapter.rest_client = double("rest_client")
     @adapter.rest_client.stub(:url) { "http://example.com"}
 
@@ -24,7 +27,7 @@ describe DataMapper::Adapters::RestAdapter do
 
     DataMapper.setup(@adapter)
   end
-
+  
   describe "#initialize" do
     before(:each) do
       class TestFormat < DataMapperRest::Format::AbstractFormat
@@ -174,6 +177,7 @@ describe DataMapper::Adapters::RestAdapter do
   end
 
   describe "#create" do
+    
     describe "when provided a Resource" do
       before(:each) do
         @hash = {
@@ -238,6 +242,7 @@ describe DataMapper::Adapters::RestAdapter do
   end
 
   describe "#read" do
+    
     context "with unscoped query" do
       before(:each) do
         @query = Book.all.query
@@ -327,6 +332,113 @@ describe DataMapper::Adapters::RestAdapter do
         @adapter.read(@query).should be_empty
       end
     end
+    
+    context "with query param wrapping" do      
+      
+      def setup_for_query_param(settings)
+        @format = double("format")
+        @query = Book.all(:author => "Dan Kubb", :comment => "garbage", :order => [:title.asc, :author.desc, :comment.asc]).query
+        @record  = {
+          "id" => 1,
+          "created_at" => DateTime.parse("2009-05-17T22:38:42-07:00"),
+          "title" => "DataMapper",
+          "author" => "Dan Kubb",
+          "comment" => "garbage"
+        }
+        @record2  = {
+          "id" => 2,
+          "created_at" => DateTime.parse("2009-05-17T22:38:41-07:00"),
+          "title" => "DataStuffer",
+          "author" => "Dan Kubb",
+          "comment" => "garbage"
+        }
+        @records = [ @record, @record2 ]
+        @adapter = DataMapper::Adapters::RestAdapter.new(:test, DataMapper::Mash[settings.merge(format: @format)])
+        @adapter.rest_client = double("rest_client")
+        @adapter.rest_client.stub(:url) { "http://example.com"}
+
+        @response = double("response")
+
+        DataMapper.setup(@adapter)
+        @format.should_receive(:accept).and_return("application/mock")
+      end
+      
+      context "with only query wrapping" do
+        def query_param_settings
+          {
+            :host     => "test.tld",
+            :port     => 81,
+            :user     => "admin",
+            :password => "secret",
+            :limit_param_name => 'unlimited',
+            :offset_param_name => 'nuffsaid',
+            :logging_level => 'debug',
+            :extra_http_headers => {:api_key => "HumptyDumpty"},
+            :enable_query_param_as_uri_encoded_json_hash => false,
+            :query_wrap_param => "query",
+            :enable_form_urlencoded_submission => true
+          }
+        end
+        
+        it "should query the resource path with params wrapped with query param name" do
+          setup_for_query_param(query_param_settings)
+          @format.stub(:resource_path) { "books.mock" }
+          @adapter.rest_client.should_receive(:[]).with("books.mock?query%5Bauthor%5D=Dan%20Kubb&query%5Bcomment_crazy_mapping%5D=garbage").and_return(@adapter.rest_client)
+          stub_mocks!
+          @adapter.read(@query)
+        end
+      end
+      
+      context "uri encode json hash" do
+        def query_param_settings
+          {
+            :host     => "test.tld",
+            :port     => 81,
+            :user     => "admin",
+            :password => "secret",
+            :limit_param_name => 'unlimited',
+            :offset_param_name => 'nuffsaid',
+            :logging_level => 'debug',
+            :extra_http_headers => {:api_key => "HumptyDumpty"},
+            :enable_query_param_as_uri_encoded_json_hash => true,
+            :query_wrap_param => "query",
+            :enable_form_urlencoded_submission => true
+          }
+        end
+        
+        def query_param_settings_no_uri_encoding_of_json_hash
+          {
+            :host     => "test.tld",
+            :port     => 81,
+            :user     => "admin",
+            :password => "secret",
+            :limit_param_name => 'unlimited',
+            :offset_param_name => 'nuffsaid',
+            :logging_level => 'debug',
+            :extra_http_headers => {:api_key => "HumptyDumpty"},
+            :enable_query_param_as_uri_encoded_json_hash => true,
+            :query_wrap_param => "",
+            :enable_form_urlencoded_submission => true
+          }
+        end
+        
+        it "should query the resource path with params appended with uri encoded json hash" do
+          setup_for_query_param(query_param_settings)
+          @format.stub(:resource_path) { "books.mock" }
+          @adapter.rest_client.should_receive(:[]).with("books.mock?query=%7B%22author%22%3A%22Dan%20Kubb%22%2C%22comment_crazy_mapping%22%3A%22garbage%22%7D").and_return(@adapter.rest_client)
+          stub_mocks!
+          @adapter.read(@query)
+        end
+        
+        it "should query the resource path with params appended with uri encoded json raw" do
+          setup_for_query_param(query_param_settings_no_uri_encoding_of_json_hash)
+          @format.stub(:resource_path) { "books.mock" }
+          @adapter.rest_client.should_receive(:[]).with("books.mock?%7B%22author%22:%22Dan%20Kubb%22,%22comment_crazy_mapping%22:%22garbage%22%7D").and_return(@adapter.rest_client)
+          stub_mocks!
+          @adapter.read(@query)
+        end
+      end
+    end
 
     context "with query scoped by a non-key" do
       before(:each) do
@@ -356,7 +468,7 @@ describe DataMapper::Adapters::RestAdapter do
         @adapter.read(@query)
       end
 
-      it "should query the resource path" do
+      it "should query the resource path with params appended" do
         @format.stub(:resource_path) { "books.mock" }
         @adapter.rest_client.should_receive(:[]).with("books.mock?author=Dan%20Kubb&comment_crazy_mapping=garbage").and_return(@adapter.rest_client)
         stub_mocks!
@@ -367,7 +479,7 @@ describe DataMapper::Adapters::RestAdapter do
         @adapter.rest_client.should_receive(:get).with(
           {:accept=>"application/mock", :api_key=>"HumptyDumpty", 
             :params=>{:order=>{:title=>:asc, :author=>:desc, :comment_crazy_mapping=>:asc}, :author=>"Dan Kubb", :comment_crazy_mapping=>"garbage"}
-            }
+          }
         ).and_return(@response)
         stub_mocks!
         @adapter.read(@query)
@@ -379,6 +491,7 @@ describe DataMapper::Adapters::RestAdapter do
         stub_mocks!
         @adapter.read(@query2).should eql @records
       end
+      
     end
   end
 

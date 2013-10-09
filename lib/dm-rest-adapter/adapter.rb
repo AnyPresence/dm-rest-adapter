@@ -1,11 +1,14 @@
 require 'oauth'
 require 'oauth/request_proxy/rest_client_request'
 require "addressable/uri"
+require 'dm-rest-adapter/helper/query_param'
 
 module DataMapperRest
   # TODO: Specs for resource format parse errors (existing bug)
 
   class Adapter < DataMapper::Adapters::AbstractAdapter
+    include ::DataMapper::Helper::QueryParam
+    
     attr_accessor :rest_client, :format
         
     def create(resources)
@@ -79,8 +82,11 @@ module DataMapperRest
         query_options[:params] = params unless params.empty?
         
         path = @format.resource_path(*path_items)
-        extracted_query_string = extract_query_string(params)
-        path = extracted_query_string.empty? ? path : "#{path}?#{extract_query_string(params)}"
+                
+        extracted_query_string = extract_query_string(modify_query_param(prune_query_string(params)))
+        
+        # Reconstruct the path with the query string appended
+        path = extracted_query_string.empty? ? path : "#{path}?#{extracted_query_string}"
         @log.debug("About to GET using #{path} with query_options of #{query_options.inspect}")
         
         target = @rest_client[path]
@@ -222,6 +228,16 @@ module DataMapperRest
         
         @log.info("Will use extra HTTP headers: #{@extra_headers.inspect}")
         @log.warn("'Content-Type' will always be set to '#{@extra_headers[:content_type]}'. Please ensure that's exactly what you intended!") if @extra_headers.has_key?(:content_type)
+      end
+      
+      if @options[:enable_query_param_as_uri_encoded_json_hash]
+        @enable_query_param_as_uri_encoded_json_hash = @options[:enable_query_param_as_uri_encoded_json_hash]
+        @log.info("Will enable query param as uri encoded json hash")
+      end
+      
+      if @options[:query_wrap_param]
+        @query_wrap_param = @options[:query_wrap_param]
+        @log.info("Will use query wrap param #{@query_wrap_param}")
       end
             
       @log.info("Configured for omniauth version 1") if @options[:auth_scheme] == "omniauth_ver_1"
@@ -385,10 +401,11 @@ module DataMapperRest
       end
     end
     
+    # Returns query param hash as a url query string
     def extract_query_string(query)
+      return URI.encode(query) if query.is_a?(String)
       uri = Addressable::URI.new
-      params = prune_query_string(query)
-      uri.query_values = params
+      uri.query_values = query
       uri.query
     end
     
