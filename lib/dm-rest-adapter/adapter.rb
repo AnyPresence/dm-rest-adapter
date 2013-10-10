@@ -1,14 +1,11 @@
 require 'oauth'
 require 'oauth/request_proxy/rest_client_request'
 require "addressable/uri"
-require 'dm-rest-adapter/helper/query_param'
 
 module DataMapperRest
   # TODO: Specs for resource format parse errors (existing bug)
 
-  class Adapter < DataMapper::Adapters::AbstractAdapter
-    include ::DataMapper::Helper::QueryParam
-    
+  class Adapter < DataMapper::Adapters::AbstractAdapter    
     attr_accessor :rest_client, :format
         
     def create(resources)
@@ -62,10 +59,8 @@ module DataMapperRest
           @log.debug("About to GET using #{path}")
           target = @rest_client[path]
           req = ::RestClient::Request.new(url: target.url, method: :get, headers: {}) 
-          req = ::DataMapperRest::Authentication.setup_auth(req, @options)
           
-          headers = finalize_header(req, create_headers)
-          
+          headers = ::DataMapperRest::Authentication.setup_auth(@rest_client, path, @options, create_headers)                  
           response = target.get(headers)
           
           @log.debug("Response to GET was #{response.inspect}")
@@ -81,20 +76,15 @@ module DataMapperRest
         params = extract_params_from_query(query)
         query_options[:params] = params unless params.empty?
         
-        path = @format.resource_path(*path_items)
-                
-        extracted_query_string = extract_query_string(modify_query_param(prune_query_string(params)))
-        
-        # Reconstruct the path with the query string appended
-        path = extracted_query_string.empty? ? path : "#{path}?#{extracted_query_string}"
-        @log.debug("About to GET using #{path} with query_options of #{query_options.inspect}")
-        
+        path = @format.resource_path(*path_items)                
+            
         target = @rest_client[path]
         req = ::RestClient::Request.new(url: target.url, method: :get, headers: {})
-        req = ::DataMapperRest::Authentication.setup_auth(req, @options)
+         
+        headers = ::DataMapperRest::Authentication.setup_auth(@rest_client, path, @options, query_options)
         
-        headers = finalize_header(req, query_options)
-    
+        # Reconstruct the path with the query string appended
+        @log.debug("About to GET using #{path} with query_options of #{headers.inspect}")
         response = target.get(headers)
         
         @log.debug("Response to GET was #{response.code} #{response.body}")
@@ -399,33 +389,6 @@ module DataMapperRest
         @log.debug("Adding REST client debugging proxy")
         RestClient.log =  $stdout
       end
-    end
-    
-    # Returns query param hash as a url query string
-    def extract_query_string(query)
-      return URI.encode(query) if query.is_a?(String)
-      uri = Addressable::URI.new
-      uri.query_values = query
-      uri.query
-    end
-    
-    def prune_query_string(query)
-      params = {}
-      query.each_pair do |k,v|
-        params[k] = v if v.is_a?(String) || v.is_a?(Symbol) || v.is_a?(Numeric)
-      end
-      params
-    end
-    
-    def finalize_header(req, headers)
-      _headers = {}
-      if @options[:auth_scheme] == "omniauth_ver_1"
-        params = headers.delete(:params)        
-        _headers = req.headers.merge(params)
-      else
-        _headers = headers
-      end
-      _headers
     end
     
   end

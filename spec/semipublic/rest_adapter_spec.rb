@@ -313,7 +313,7 @@ describe DataMapper::Adapters::RestAdapter do
 
       it "should use GET" do
         @adapter.rest_client.should_receive(:get).with(
-          {:accept=>"application/mock", :api_key=>"HumptyDumpty"}
+          {:accept=>"application/mock", :api_key=>"HumptyDumpty", :params=>{}}
           ).and_return(@response)
         stub_mocks!
         @adapter.read(@query)
@@ -356,6 +356,7 @@ describe DataMapper::Adapters::RestAdapter do
         @adapter = DataMapper::Adapters::RestAdapter.new(:test, DataMapper::Mash[settings.merge(format: @format)])
         @adapter.rest_client = double("rest_client")
         @adapter.rest_client.stub(:url) { "http://example.com"}
+        @adapter.rest_client.stub(:code) {200}
 
         @response = double("response")
 
@@ -383,7 +384,15 @@ describe DataMapper::Adapters::RestAdapter do
         it "should query the resource path with params wrapped with query param name" do
           setup_for_query_param(query_param_settings)
           @format.stub(:resource_path) { "books.mock" }
-          @adapter.rest_client.should_receive(:[]).with("books.mock?query%5Bauthor%5D=Dan%20Kubb&query%5Bcomment_crazy_mapping%5D=garbage").and_return(@adapter.rest_client)
+          #@adapter.rest_client.should_receive(:[]).with("books.mock?query%5Bauthor%5D=Dan%20Kubb&query%5Bcomment_crazy_mapping%5D=garbage").and_return(@adapter.rest_client)
+          @adapter.rest_client.should_receive(:get).with(
+            :accept  => "application/mock",
+            :api_key => "HumptyDumpty",
+            :params  => {"query[order]"=>{:title=>:asc, :author=>:desc, :comment_crazy_mapping=>:asc},
+                         "query[author]"=>"Dan Kubb", "query[comment_crazy_mapping]"=>"garbage"}
+          ).and_return(@adapter.rest_client)
+          @adapter.rest_client.stub(:code) {200}
+          @adapter.rest_client.stub(:body) {""}
           stub_mocks!
           @adapter.read(@query)
         end
@@ -425,7 +434,13 @@ describe DataMapper::Adapters::RestAdapter do
         it "should query the resource path with params appended with uri encoded json hash" do
           setup_for_query_param(query_param_settings)
           @format.stub(:resource_path) { "books.mock" }
-          @adapter.rest_client.should_receive(:[]).with("books.mock?query=%7B%22author%22%3A%22Dan%20Kubb%22%2C%22comment_crazy_mapping%22%3A%22garbage%22%7D").and_return(@adapter.rest_client)
+          @adapter.rest_client.should_receive(:get).with(
+            :accept  => "application/mock",
+            :api_key => "HumptyDumpty",
+            :params  => {"query"=>{:author => "Dan Kubb", :comment_crazy_mapping => "garbage", :order=>{:title=>:asc, :author=>:desc, :comment_crazy_mapping=>:asc}}}       
+          ).and_return(@adapter.rest_client)
+          @adapter.rest_client.stub(:code) {200}
+          @adapter.rest_client.stub(:body) {""}
           stub_mocks!
           @adapter.read(@query)
         end
@@ -433,7 +448,14 @@ describe DataMapper::Adapters::RestAdapter do
         it "should query the resource path with params appended with uri encoded json raw" do
           setup_for_query_param(query_param_settings_no_uri_encoding_of_json_hash)
           @format.stub(:resource_path) { "books.mock" }
-          @adapter.rest_client.should_receive(:[]).with("books.mock?%7B%22author%22:%22Dan%20Kubb%22,%22comment_crazy_mapping%22:%22garbage%22%7D").and_return(@adapter.rest_client)
+          # @adapter.rest_client.should_receive(:[]).with("books.mock?%7B%22author%22:%22Dan%20Kubb%22,%22comment_crazy_mapping%22:%22garbage%22%7D").and_return(@adapter.rest_client)
+          @adapter.rest_client.should_receive(:get).with(
+            :accept  => "application/mock",
+            :api_key => "HumptyDumpty",
+            :params  => {:author => "Dan Kubb", :comment_crazy_mapping => "garbage", :order=>{:title=>:asc, :author=>:desc, :comment_crazy_mapping=>:asc}}
+          ).and_return(@adapter.rest_client)
+          @adapter.rest_client.stub(:code) {200}
+          @adapter.rest_client.stub(:body) {""}
           stub_mocks!
           @adapter.read(@query)
         end
@@ -470,7 +492,11 @@ describe DataMapper::Adapters::RestAdapter do
 
       it "should query the resource path with params appended" do
         @format.stub(:resource_path) { "books.mock" }
-        @adapter.rest_client.should_receive(:[]).with("books.mock?author=Dan%20Kubb&comment_crazy_mapping=garbage").and_return(@adapter.rest_client)
+        @adapter.rest_client.should_receive(:get).with(
+          {:accept=>"application/mock", :api_key=>"HumptyDumpty", 
+            :params=>{:order=>{:title=>:asc, :author=>:desc, :comment_crazy_mapping=>:asc}, :author=>"Dan Kubb", :comment_crazy_mapping=>"garbage"}
+          }
+        ).and_return(@response)
         stub_mocks!
         @adapter.read(@query)
       end
@@ -809,7 +835,8 @@ describe DataMapper::Adapters::RestAdapter do
           @adapter.rest_client.should_receive(:[]).and_return(rest_client)
           rest_client.should_receive(:get).with do |*args|
             options = args.pop            
-                    
+            
+            
             options["Authorization"].to_s.should =~ /oauth_signature_method="RSA-SHA1"/
             options["Authorization"].to_s.should =~ /oauth_consumer_key="12345"/
             options["Authorization"].to_s.should =~ /oauth_signature=".+?"/
