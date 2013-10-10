@@ -2,18 +2,17 @@ module DataMapper
   module Helper
     module QueryParam
       
+      DEFAULT_QUERY_WRAPPER = "query".freeze
+      
       # Modifies the query param
       def modify_query_param(params, options={}, params_to_exclude=[])
         return {} if params.nil?
         stripped_params = params.clone
         params_to_exclude.each { |k| stripped_params.delete(k) }
         
-        if options[:enable_query_param_as_uri_encoded_json_hash]
-          if options[:query_wrap_param].nil? || options[:query_wrap_param].empty?
-            return stripped_params
-          else
-            return {"#{options[:query_wrap_param]}" => stripped_params}
-          end
+        if options[:enable_query_param_as_uri_encoded_json_hash] == true
+          _query = (options[:query_wrap_param].nil? || options[:query_wrap_param].empty?) ? DEFAULT_QUERY_WRAPPER : options[:query_wrap_param]
+          return {"#{_query}" => stripped_params.to_json}
         else
           if options[:query_wrap_param].nil? || options[:query_wrap_param].empty?
             return stripped_params
