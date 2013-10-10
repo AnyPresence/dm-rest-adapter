@@ -9,7 +9,7 @@ module DataMapper
       
       def initialize(options)
         @options = options
-        private_key = @options[:omniauth_ver_1_private_key]
+        private_key = cleanup_private_key(@options[:omniauth_ver_1_private_key])
         consumer_key = @options[:omniauth_ver_1_consumer_key] || ""
         site = @options[:omniauth_ver_1_site] || ""
         @omniauth_ver_1_consumer = ::OAuth::Consumer.new(consumer_key.strip, private_key.strip, :site => site)
@@ -26,6 +26,12 @@ module DataMapper
         req.headers.merge!({"Authorization" => oauth_helper.header})
 
         req
+      end
+      
+      private
+      
+      def cleanup_private_key(private_key)
+        private_key.gsub("\n\n", "\n").gsub("\"", "")
       end
       
     end
