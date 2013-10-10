@@ -31,7 +31,7 @@ module DataMapper
       private
       
       def cleanup_private_key(private_key)
-        private_key.gsub("\n\n", "\n").gsub("\"", "")
+        private_key.gsub("\\n", "\n").gsub("\"", "")
       end
       
     end
