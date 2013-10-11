@@ -82,7 +82,7 @@ module DataMapperRest
         selector = "/#{element_name_plural(model)}/#{element_name(model)}"
         
         if !@collection_selector.nil? && !@collection_selector.empty?
-          if @collection_selector[0] =~ /\w/
+          if @collection_selector[0] =~ /\w/ || @collection_selector[0] =~ /\./
             selector = "/#{@collection_selector.gsub('.','/')}#{selector}"
           else
             selector = "#{@collection_selector.gsub('.','/')}#{selector}"
