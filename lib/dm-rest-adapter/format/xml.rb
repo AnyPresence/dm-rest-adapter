@@ -24,8 +24,8 @@ module DataMapperRest
 
         field_to_property = Hash[ model.properties(repository_name).map { |p| [ p.field, p ] } ]
 
-        selector = collection_selector_expression(model)        
-
+        selector = collection_selector_expression(model)
+        
         doc.elements.collect(selector) do |entity_element|
           record_from_rexml(entity_element, field_to_property)
         end
@@ -71,6 +71,7 @@ module DataMapperRest
         selector = "/#{element_name(model)}"
         
         if @record_selector
+          
           selector = "/#{@record_selector.gsub('.','/')}#{selector}"
         end
         
@@ -80,8 +81,12 @@ module DataMapperRest
       def collection_selector_expression(model)
         selector = "/#{element_name_plural(model)}/#{element_name(model)}"
         
-        if @collection_selector
-          selector = "/#{@collection_selector.gsub('.','/')}#{selector}"
+        if !@collection_selector.nil? && !@collection_selector.empty?
+          if @collection_selector[0] =~ /\w/
+            selector = "/#{@collection_selector.gsub('.','/')}#{selector}"
+          else
+            selector = "#{@collection_selector.gsub('.','/')}#{selector}"
+          end
         end
         
         selector
