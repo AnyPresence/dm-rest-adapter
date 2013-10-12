@@ -1,10 +1,19 @@
 module DataMapperRest
   module Format
     class Xml < AbstractFormat
+      
+      attr_accessor :override_default_xml_collection_selector, :override_default_xml_record_selector
+      
       def default_options
         DataMapper::Mash.new({ :mime => "application/xml", :extension => "xml" })
       end
       
+      def initialize(options={})
+        super
+        @override_default_xml_collection_selector = options[:override_default_xml_collection_selector] if options[:override_default_xml_collection_selector]
+        @override_default_xml_record_selector = options[:override_default_xml_record_selector] if options[:override_default_xml_record_selector]
+      end
+        
       def generate_payload(resource)
         if @enable_form_urlencoded_submission
           hash = properties_to_serialize(resource).reduce({}) do |h, property|
@@ -70,9 +79,12 @@ module DataMapperRest
       def record_selector_expression(model)
         selector = "/#{element_name(model)}"
         
-        if @record_selector
-          
-          selector = "/#{@record_selector.gsub('.','/')}#{selector}"
+        if !@record_selector.nil? && !@record_selector.empty?
+          if !@override_default_xml_record_selector
+            selector = "/#{@record_selector.gsub('.','/')}#{selector}"
+          else
+            selector = @record_selector.gsub('.','/')
+          end
         end
         
         selector
@@ -82,10 +94,10 @@ module DataMapperRest
         selector = "/#{element_name_plural(model)}/#{element_name(model)}"
         
         if !@collection_selector.nil? && !@collection_selector.empty?
-          if @collection_selector[0] =~ /\w/ || @collection_selector[0] =~ /\./
+          if !@override_default_xml_collection_selector
             selector = "/#{@collection_selector.gsub('.','/')}#{selector}"
           else
-            selector = "#{@collection_selector.gsub('.','/')}#{selector}"
+            selector = @collection_selector.gsub('.','/')
           end
         end
         

@@ -225,6 +225,20 @@ module DataMapperRest
         @log.info("Will enable query param as uri encoded json hash")
       end
       
+      if @options[:override_default_xml_collection_selector]
+        @override_default_xml_collection_selector = @options[:override_default_xml_collection_selector]
+        @log.info("Will override default xml collection selector")
+      else
+        @override_default_xml_collection_selector = false
+      end
+      
+      if @options[:override_default_xml_record_selector]
+        @override_default_xml_record_selector = @options[:override_default_xml_record_selector]
+        @log.info("Will override default xml record selector")
+      else
+        @override_default_xml_record_selector = false
+      end
+            
       if @options[:query_wrap_param]
         @query_wrap_param = @options[:query_wrap_param]
         @log.info("Will use query wrap param #{@query_wrap_param}")
