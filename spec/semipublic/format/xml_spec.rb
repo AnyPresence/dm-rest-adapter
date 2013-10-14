@@ -138,6 +138,13 @@ describe DataMapperRest::Format::Xml do
 
     end
     
+    it "default collection selector with no override" do
+      @format.send(:collection_selector_expression, Book).should == "/livres/livre"
+      
+      @format.collection_selector = "response.bogus"
+      @format.send(:collection_selector_expression, Book).should == "//response/bogus"
+    end
+    
     it "loads a recordset from the string representation" do
       collection = @format.parse_collection(@xml, Book)
       collection.should have(2).entries
