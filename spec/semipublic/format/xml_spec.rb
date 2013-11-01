@@ -86,7 +86,7 @@ describe DataMapper::Adapters::Format::Xml do
     end
     
     it "loads a record from XML using a provided selector" do
-      @format.record_selector = 'response.forecast.txt_forecast'
+      @format.record_selector = 'response.forecast.txt_forecast.forecastday'
       record = @format.parse_record(@weather_xml_instance, ForecastDay)
       record["period"].should == 0
   		record["icon"].should == "snow"
@@ -99,7 +99,6 @@ describe DataMapper::Adapters::Format::Xml do
     
     it "loads a record from XML using a overrided provided selector" do
       @format.record_selector = 'response.forecast.txt_forecast.forecastday'
-      @format.override_default_xml_record_selector = true
       record = @format.parse_record(@weather_xml_instance, ForecastDay)
       record["period"].should == 0
   		record["icon"].should == "snow"
@@ -142,10 +141,10 @@ describe DataMapper::Adapters::Format::Xml do
       @format.send(:collection_selector_expression, Book).should == "/livres/livre"
       
       @format.collection_selector = "response.bogus"
-      @format.send(:collection_selector_expression, Book).should == "/response/bogus/livres/livre"
+      @format.send(:collection_selector_expression, Book).should == "/response/bogus"
       
       @format.collection_selector = ".response.bogus"
-      @format.send(:collection_selector_expression, Book).should == "//response/bogus/livres/livre"
+      @format.send(:collection_selector_expression, Book).should == "//response/bogus"
     end
     
     it "loads a recordset from the string representation" do
@@ -162,19 +161,19 @@ describe DataMapper::Adapters::Format::Xml do
     end
     
     it "loads a recordset from a string represention using a provided selector" do
-      @format.collection_selector = 'response.forecast.txt_forecast'
+      @format.collection_selector = 'response.forecast.txt_forecast.forecastdays.forecastday'
       collection = @format.parse_collection(@weather_xml_collection, ForecastDay)
       collection.should have(8).entries
     end
     
     it "loads a recordset from a string represention using a provided overrided selector" do
-      @format.collection_selector = 'response.forecast.txt_forecast.forecastdays.forecastday'
-      @format.override_default_xml_collection_selector = true
+      @format.collection_selector = '.forecastday'
       collection = @format.parse_collection(@weather_xml_collection, ForecastDay)
-      collection.should have(8).entries
+      collection.should have(12).entries
     end
     
     it "loads a recordset from a crazy string representation that has array properties" do
+      @format.collection_selector = nil
       collection = @format.parse_collection(NOTICES_XML_COLLECTION, Notice)
       collection.should have(5).entries
       collection[0]["id"].should == 58
@@ -187,7 +186,7 @@ describe DataMapper::Adapters::Format::Xml do
     end
     
     it "loads a recordset from a crazy string representation using provided selector" do
-      @format.collection_selector = 'Notices.Notice'
+      @format.collection_selector = '.Comment'
       collection = @format.parse_collection(NOTICES_XML_COLLECTION, Comment)
       collection.should have(13).entries
     end
@@ -219,7 +218,7 @@ describe DataMapper::Adapters::Format::Xml do
       </response>
       XML
       
-      @format.collection_selector = 'response.silly_forecast.txt-forecast'
+      @format.collection_selector = 'response.silly_forecast.txt-forecast.forecastdays.forecastday'
       collection = @format.parse_collection(data, ForecastDay)
       collection.should have(1).entries
       record = collection[0]

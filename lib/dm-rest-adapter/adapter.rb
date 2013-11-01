@@ -212,10 +212,11 @@ module DataMapper
             @extra_headers = Hash[@extra_headers.map{ |k, v| [k.to_sym, v] }]
           rescue
             # Invalid json
+            @log.error("Invalid JSON in extra HTTP headers!")
           end
         end
         
-        @log.info("Will use extra HTTP headers: #{@extra_headers.inspect}")
+        @log.info("Will use extra HTTP headers: #{@extra_headers.inspect}") unless @extra_headers.empty?
         @log.warn("'Content-Type' will always be set to '#{@extra_headers[:content_type]}'. Please ensure that's exactly what you intended!") if @extra_headers.has_key?(:content_type)
       end
       
@@ -225,17 +226,11 @@ module DataMapper
       end
       
       if @options[:override_default_xml_collection_selector]
-        @override_default_xml_collection_selector = @options[:override_default_xml_collection_selector]
-        @log.info("Will override default xml collection selector")
-      else
-        @override_default_xml_collection_selector = false
+        @log.warn("override_default_xml_collection_selector is deprecated.")
       end
       
       if @options[:override_default_xml_record_selector]
-        @override_default_xml_record_selector = @options[:override_default_xml_record_selector]
-        @log.info("Will override default xml record selector")
-      else
-        @override_default_xml_record_selector = false
+        @log.warn("override_default_xml_record_selector is deprecated.")
       end
             
       if @options[:query_wrap_param]
