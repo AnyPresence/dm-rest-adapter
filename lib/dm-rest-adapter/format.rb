@@ -1,5 +1,7 @@
-module DataMapperRest
-  module Format
+module DataMapper
+  module Adapters
+    module Format
+      
     class AbstractFormat
   	  attr_accessor :extension, :accept, :mime, :repository_name, :record_selector, :collection_selector
 
@@ -100,5 +102,6 @@ module DataMapperRest
           "#{self.class}#collection_selector_expression not implemented"
       end
     end
+  end
   end
 end

@@ -30,7 +30,7 @@ describe DataMapper::Adapters::RestAdapter do
   
   describe "#initialize" do
     before(:each) do
-      class TestFormat < DataMapperRest::Format::AbstractFormat
+      class TestFormat < DataMapper::Adapters::Format::AbstractFormat
         def generate_payload(resource)
           "<<mock format>>"
         end
@@ -188,7 +188,7 @@ describe DataMapper::Adapters::RestAdapter do
         }
         @resource  = Book.new(@hash)
         @resources = [ @resource ]
-        @a_format = DataMapperRest::Format::Json.new(:enable_form_urlencoded_submission => true)
+        @a_format = DataMapper::Adapters::Format::Json.new(:enable_form_urlencoded_submission => true)
       end
 
       it "should ask the format for the path to each Model" do

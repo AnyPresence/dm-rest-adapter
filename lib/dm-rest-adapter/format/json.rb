@@ -1,7 +1,8 @@
 require 'multi_json'
 require 'jsonpath'
-
-module DataMapperRest
+module DataMapper
+  module Adapters
+    
   module Format
     class Json < AbstractFormat
       def default_options
@@ -115,5 +116,6 @@ module DataMapperRest
         value.kind_of?(::Hash) || value.kind_of?(::Array)
       end
     end
+  end
   end
 end

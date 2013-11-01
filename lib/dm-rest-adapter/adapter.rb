@@ -1,11 +1,10 @@
-require 'oauth'
-require 'oauth/request_proxy/rest_client_request'
-require "addressable/uri"
 
-module DataMapperRest
+module DataMapper
+  module Adapters
   # TODO: Specs for resource format parse errors (existing bug)
 
-  class Adapter < DataMapper::Adapters::AbstractAdapter    
+  class Adapter < DataMapper::Adapters::AbstractAdapter
+    include ::DataMapper::Adapters::Format    
     attr_accessor :rest_client, :format
         
     def create(resources)
@@ -405,5 +404,10 @@ module DataMapperRest
       end
     end
     
+  end
+  
+  ::DataMapper::Associations::Relationship::OPTIONS << :nested
+  ::DataMapper::Adapters::RestAdapter = DataMapper::Adapters::Adapter
+  self.send(:const_added,:RestAdapter)
   end
 end

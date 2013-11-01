@@ -9,6 +9,7 @@ DM_VERSION   = '~> 1.2.0'
 JSON_VERSION = '~> 1.8'
 JSONPATH_VERSION = '~> 0.5.4'
 REST_CLIENT_VERSION = '~> 1.6'
+NOKOGIRI_VERSION = '~> 1.6'
 
 gem 'dm-serializer', DM_VERSION, SOURCE => "#{DATAMAPPER}/dm-serializer#{REPO_POSTFIX}", :branch => "release-1.2"
 
@@ -16,6 +17,7 @@ gem 'multi_json',  JSON_VERSION
 gem 'json',        JSON_VERSION
 gem 'json_pure',   JSON_VERSION
 gem 'jsonpath', JSONPATH_VERSION
+gem 'nokogiri', NOKOGIRI_VERSION
 
 group :development do
 

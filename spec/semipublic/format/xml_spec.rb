@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe DataMapperRest::Format::Xml do
+describe DataMapper::Adapters::Format::Xml do
   let(:default_mime) { "application/xml" }
   let(:default_extension) { "xml" }
   
@@ -8,7 +8,7 @@ describe DataMapperRest::Format::Xml do
   
   describe "#generate_payload" do
     before(:each) do
-      @format = DataMapperRest::Format::Xml.new
+      @format = DataMapper::Adapters::Format::Xml.new
       @time = DateTime.now
       @xml = DataMapper::Ext::String.compress_lines(<<-XML)
         <book>
@@ -37,7 +37,7 @@ describe DataMapperRest::Format::Xml do
   
   describe "#update_attributes" do
     before(:each) do
-      @format = DataMapperRest::Format::Xml.new
+      @format = DataMapper::Adapters::Format::Xml.new
       @time = DateTime.new
       @xml = DataMapper::Ext::String.compress_lines(<<-XML)
         <livre>
@@ -64,7 +64,7 @@ describe DataMapperRest::Format::Xml do
   
   describe "#parse_record" do
     before(:each) do
-      @format = DataMapperRest::Format::Xml.new
+      @format = DataMapper::Adapters::Format::Xml.new
       @time = DateTime.new
       @xml = DataMapper::Ext::String.compress_lines(<<-XML)
         <livre>
@@ -113,7 +113,7 @@ describe DataMapperRest::Format::Xml do
   
   describe "#parse_collection" do
     before(:each) do
-      @format = DataMapperRest::Format::Xml.new
+      @format = DataMapper::Adapters::Format::Xml.new
       @time = DateTime.new
       @xml = DataMapper::Ext::String.compress_lines(<<-XML)
         <livres>
@@ -236,7 +236,7 @@ describe DataMapperRest::Format::Xml do
   describe "#parse nested collection" do
 
     before(:each) do
-      @format = DataMapperRest::Format::Xml.new
+      @format = DataMapper::Adapters::Format::Xml.new
       # @format.collection_selector = '.'
       @time = DateTime.new
       @xml = DataMapper::Ext::String.compress_lines(<<-XML)

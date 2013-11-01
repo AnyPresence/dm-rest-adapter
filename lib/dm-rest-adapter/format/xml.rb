@@ -1,4 +1,6 @@
-module DataMapperRest
+module DataMapper
+  module Adapters
+    
   module Format
     class Xml < AbstractFormat
       
@@ -29,23 +31,23 @@ module DataMapperRest
       end
       
       def parse_collection(xml, model)
-        doc = REXML::Document::new(xml)
+        doc = Nokogiri::XML(xml)
 
         field_to_property = Hash[ model.properties(repository_name).map { |p| [ p.field, p ] } ]
 
         selector = collection_selector_expression(model)
         
-        doc.elements.collect(selector) do |entity_element|
+        doc.xpath(selector).collect do |entity_element|
           record_from_rexml(entity_element, field_to_property)
         end
       end
       
       def parse_record(xml, model)
-        doc = REXML::Document::new(xml)
+        doc = Nokogiri::XML(xml)
 
         selector = record_selector_expression(model)
         
-        unless entity_element = REXML::XPath.first(doc, selector)
+        unless entity_element = doc.xpath(selector).first
           raise "No root element matching #{element_name} in xml"
         end
 
@@ -108,7 +110,8 @@ module DataMapperRest
         return [] if array_element.nil?
         objects = []
         array_selector = build_array_selector(array_property_name)
-        REXML::Document::new(array_element).elements.collect(array_selector) do |entity_element|
+
+        Nokogiri::XML(array_element).xpath(array_selector).collect do |entity_element|
           hash = Hash.new
           hash = walk_elements(entity_element)
           objects << hash
@@ -131,32 +134,22 @@ module DataMapperRest
       # Walk down an XML tree starting at the entity_element and gobble up entities
       # to build a nested hash.
       def walk_elements(entity_element)        
-        _hash = Hash.new
-
-        if !entity_element.is_a?(REXML::Elements) && entity_element.respond_to?(:has_elements?)
-          entity_element.elements.map do |element|
-            do_walk(_hash, element)
-          end
+        
+        if entity_element.element_children().empty?
+          field = entity_element.name.to_s.tr('-', '_')
+          value = entity_element.text
+          return { snake_case(field) => value }
         end
 
-        if entity_element.is_a?(REXML::Elements)
-          entity_element.map do |element|
-            do_walk(_hash, element)
-          end
+        hash = Hash.new
+        
+        entity_element.element_children().map do |element|
+          hash.merge! walk_elements(element)
         end
         
-        _hash
-      end
-      
-      def do_walk(hash, element)
-        field = element.name.to_s.tr('-', '_')
-        value = element.has_text? ? element.text : ""
-        if element.respond_to?(:has_elements?) && element.has_elements?
-          hash[snake_case(field)] = walk_elements(element.elements)
-        else
-          hash[snake_case(field)] = value
-        end
+        hash
       end
     end
+  end
   end
 end

@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe DataMapperRest::Format::Json do
+describe DataMapper::Adapters::Format::Json do
   let(:default_mime) { "application/json" }
   let(:default_extension) { "json" }
   
@@ -8,7 +8,7 @@ describe DataMapperRest::Format::Json do
   
   describe "#generate_payload" do
     before(:each) do
-      @format = DataMapperRest::Format::Json.new
+      @format = DataMapper::Adapters::Format::Json.new
       @time = DateTime.now
     end
     
@@ -70,7 +70,7 @@ describe DataMapperRest::Format::Json do
   
   describe "#update_attributes" do
     before(:each) do
-      @format = DataMapperRest::Format::Json.new
+      @format = DataMapper::Adapters::Format::Json.new
       @time = DateTime.new
       @json = '{"id":1,"created_at":"' + @time.to_s + '","title":"Testing","author":"Testy McTesty","comment":"No comment dude"}'
     end
@@ -88,7 +88,7 @@ describe DataMapperRest::Format::Json do
   
   describe "#parse_record" do
     before(:each) do
-      @format = DataMapperRest::Format::Json.new
+      @format = DataMapper::Adapters::Format::Json.new
       @time = DateTime.new
       @json = '{"id":1,"created_at":"' + @time.to_s + '","title":"Testing","author":"Testy McTesty","comment_crazy_mapping":"Donuts"}'
       @weather_json_instance = WUNDERGROUND_JSON_INSTANCE
@@ -119,7 +119,7 @@ describe DataMapperRest::Format::Json do
   describe "#parse_collection" do
     before(:each) do
       DataMapper::Logger.new($stdout,'debug')
-      @format = DataMapperRest::Format::Json.new
+      @format = DataMapper::Adapters::Format::Json.new
       @time = DateTime.new.to_s
       @json = '[{"id":1,"created_at":"' + @time + '","title":"Testing","author":"Testy McTesty","comment_crazy_mapping":"Itzy Bitzy Spider"},' +
         '{"id":2,"created_at":"' + @time + '","title":"Testing 2","author":"Besty McBesty"}]'
@@ -228,7 +228,7 @@ describe DataMapperRest::Format::Json do
     #   @format.collection_selector = "modules.Items.content"
     #   collection = @format.parse_collection(data, Article)
     #   collection.should_not be_nil
-    #   collection.should have(44).entries
+    #   collection.should have(41).entries
     # end
     
     it "loads a recordset from a JSON string with nested array and hash properties using the provided selector" do
