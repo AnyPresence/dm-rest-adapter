@@ -8,7 +8,7 @@ def default_settings
     :password => "secret",
     :limit_param_name => 'unlimited',
     :offset_param_name => 'nuffsaid',
-    :logging_level => 'debug',
+    :logging_level => SPEC_LOGGING_LEVEL,
     :extra_http_headers => {:api_key => "HumptyDumpty"},
     :enable_form_urlencoded_submission => true
   }
@@ -141,7 +141,7 @@ describe DataMapper::Adapters::RestAdapter do
         :format   => format,
         :limit_param_name => 'unlimited',
         :offset_param_name => 'nuffsaid',
-        :logging_level => 'debug',
+        :logging_level => SPEC_LOGGING_LEVEL,
         :extra_http_headers => {:api_key => "HumptyDumpty"},
         :enable_form_urlencoded_submission => true
       }])
@@ -163,7 +163,7 @@ describe DataMapper::Adapters::RestAdapter do
         :format   => format,
         :limit_param_name => 'unlimited',
         :offset_param_name => 'nuffsaid',
-        :logging_level => 'debug',
+        :logging_level => SPEC_LOGGING_LEVEL,
         :extra_http_headers => headers,
         :enable_form_urlencoded_submission => true
       }])
@@ -373,7 +373,7 @@ describe DataMapper::Adapters::RestAdapter do
             :password => "secret",
             :limit_param_name => 'unlimited',
             :offset_param_name => 'nuffsaid',
-            :logging_level => 'debug',
+            :logging_level => SPEC_LOGGING_LEVEL,
             :extra_http_headers => {:api_key => "HumptyDumpty"},
             :enable_query_param_as_uri_encoded_json_hash => false,
             :query_wrap_param => "query",
@@ -407,7 +407,7 @@ describe DataMapper::Adapters::RestAdapter do
             :password => "secret",
             :limit_param_name => 'unlimited',
             :offset_param_name => 'nuffsaid',
-            :logging_level => 'debug',
+            :logging_level => SPEC_LOGGING_LEVEL,
             :extra_http_headers => {:api_key => "HumptyDumpty"},
             :enable_query_param_as_uri_encoded_json_hash => true,
             :query_wrap_param => "query",
@@ -423,7 +423,7 @@ describe DataMapper::Adapters::RestAdapter do
             :password => "secret",
             :limit_param_name => 'unlimited',
             :offset_param_name => 'nuffsaid',
-            :logging_level => 'debug',
+            :logging_level => SPEC_LOGGING_LEVEL,
             :extra_http_headers => {:api_key => "HumptyDumpty"},
             :enable_query_param_as_uri_encoded_json_hash => true,
             :query_wrap_param => "",

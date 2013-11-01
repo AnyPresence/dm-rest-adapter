@@ -118,7 +118,6 @@ describe DataMapper::Adapters::Format::Json do
   
   describe "#parse_collection" do
     before(:each) do
-      DataMapper::Logger.new($stdout,'debug')
       @format = DataMapper::Adapters::Format::Json.new
       @time = DateTime.new.to_s
       @json = '[{"id":1,"created_at":"' + @time + '","title":"Testing","author":"Testy McTesty","comment_crazy_mapping":"Itzy Bitzy Spider"},' +

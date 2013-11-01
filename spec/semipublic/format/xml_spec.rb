@@ -236,7 +236,6 @@ describe DataMapper::Adapters::Format::Xml do
 
     before(:each) do
       @format = DataMapper::Adapters::Format::Xml.new
-      # @format.collection_selector = '.'
       @time = DateTime.new
       @xml = DataMapper::Ext::String.compress_lines(<<-XML)
         <bookmarks>

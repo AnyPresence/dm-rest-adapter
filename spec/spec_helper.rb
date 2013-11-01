@@ -22,3 +22,4 @@ Pathname.glob((ROOT + 'spec/**/shared/**/*.rb').to_s).each { |file| require file
 DataMapper.finalize
 
 
+SPEC_LOGGING_LEVEL= 'error' # 'debug'
