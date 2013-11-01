@@ -142,7 +142,10 @@ describe DataMapperRest::Format::Xml do
       @format.send(:collection_selector_expression, Book).should == "/livres/livre"
       
       @format.collection_selector = "response.bogus"
-      @format.send(:collection_selector_expression, Book).should == "//response/bogus"
+      @format.send(:collection_selector_expression, Book).should == "/response/bogus/livres/livre"
+      
+      @format.collection_selector = ".response.bogus"
+      @format.send(:collection_selector_expression, Book).should == "//response/bogus/livres/livre"
     end
     
     it "loads a recordset from the string representation" do
@@ -228,5 +231,58 @@ describe DataMapperRest::Format::Xml do
   		record["fcttext_metric"].should == "Overcast with rain. Fog early. High of 5C. Winds from the South at 10 to 15 km/h. Chance of rain 90% with rainfall amounts near 6.1 mm possible."
   		record["pop"].should == "90"
     end
+  end
+
+  describe "#parse nested collection" do
+
+    before(:each) do
+      @format = DataMapperRest::Format::Xml.new
+      # @format.collection_selector = '.'
+      @time = DateTime.new
+      @xml = DataMapper::Ext::String.compress_lines(<<-XML)
+        <bookmarks>
+          <bookmark>
+            <id type="integer">1</id>
+            <created_at type="datetime">#{@time.to_s}</created_at>
+            <name>Testing</name>
+            <notices>
+              <notice>
+                  <user>cupcake</user>
+                  <message>uh oh</message>
+               </notice>
+               <notice>
+                  <user>cupcake1</user>
+                  <message>uh oh</message>
+              </notice>
+            </notices>
+          </bookmark>
+          <bookmark>
+            <id type="integer">2</id>
+            <created_at type="datetime">#{@time.to_s}</created_at>
+            <name>Testing 1</name>
+            <notices>
+              <notice>
+                  <user>cookie</user>
+                  <message>uh oh</message>
+              </notice>
+            </notices>
+          </bookmark>
+        </bookmarks>
+      XML
+
+    end
+
+    it "loads a recordset from the string representation" do
+      collection = @format.parse_collection(@xml, Bookmark)
+      collection.should have(2).entries
+      collection[0]["id"].should == 1
+      collection[0]["created_at"].should == @time
+      collection[0]['notices'].size.should == 2
+      collection[0]['notices'][0]["user"].should == "cupcake"
+      collection[0]['notices'][0]["message"].should == "uh oh"
+      collection[0]['notices'][1]["user"].should == "cupcake1"
+      collection[0]['notices'][1]["message"].should == "uh oh"
+    end
+
   end
 end

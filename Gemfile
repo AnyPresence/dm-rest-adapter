@@ -40,7 +40,7 @@ group :datamapper do
 
   gem 'dm-core',      DM_VERSION, SOURCE => "#{DATAMAPPER}/dm-core#{REPO_POSTFIX}", :branch => "release-1.2"
   gem 'rest-client',  REST_CLIENT_VERSION
-  gem 'oauth', :git => "git://github.com/galois17/oauth-ruby.git", :branch => "add-rest-client"
+  gem 'oauth', :git => "git://github.com/AnyPresence/oauth-ruby.git"
 
   plugins = ENV['PLUGINS'] || ENV['PLUGIN']
   plugins = plugins.to_s.tr(',', ' ').split.uniq

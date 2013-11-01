@@ -92,7 +92,7 @@ module DataMapperRest
       
       def collection_selector_expression(model)
         selector = "/#{element_name_plural(model)}/#{element_name(model)}"
-        
+                
         if !@collection_selector.nil? && !@collection_selector.empty?
           if !@override_default_xml_collection_selector
             selector = "/#{@collection_selector.gsub('.','/')}#{selector}"
@@ -144,7 +144,7 @@ module DataMapperRest
             do_walk(_hash, element)
           end
         end
-
+        
         _hash
       end
       
