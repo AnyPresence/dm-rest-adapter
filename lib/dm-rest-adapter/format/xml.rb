@@ -30,7 +30,7 @@ module DataMapper
         selector = collection_selector_expression(model)
         
         doc.xpath(selector).collect do |entity_element|
-          record_from_rexml(entity_element, field_to_property)
+          record_from_xml(entity_element, field_to_property)
         end
       end
       
@@ -44,12 +44,12 @@ module DataMapper
         end
 
         field_to_property = Hash[ properties(model).map { |p| [ p.field, p ] } ]
-        record_from_rexml(entity_element, field_to_property)
+        record_from_xml(entity_element, field_to_property)
       end
 
       private
       
-      def record_from_rexml(entity_element, field_to_property)
+      def record_from_xml(entity_element, field_to_property)
         record = {}
 
         entity_element.elements.map do |element|
