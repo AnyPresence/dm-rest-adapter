@@ -176,13 +176,13 @@ describe DataMapper::Adapters::Format::Xml do
       @format.collection_selector = nil
       collection = @format.parse_collection(NOTICES_XML_COLLECTION, Notice)
       collection.should have(5).entries
-      collection[0]["id"].should == 58
-      collection[0]["customer_name"].should == "ABC Corp"
-      collection[0]["process"].should == "Finance"
-      collection[0]["notice_category"].should == "Company News"
-      collection[0]["comments"].should have(5).entries
-      collection[2]["comments"].should have(3).entries
-      collection[2]["comments"].should == [{"created_at"=>"4/30/2013 3:03:50 PM", "created_by"=>"Mark Greene", "comment_text"=>"This is a comment by a different user."}, {"created_at"=>"4/30/2013 3:02:31 PM", "created_by"=>"John Miller", "comment_text"=>"This is a \r test comment\r with line bresk 2"}, {"created_at"=>"4/30/2013 3:02:07 PM", "created_by"=>"John Miller", "comment_text"=>"This is a test comment 1"}]
+      collection[0]["ID"].should == 58
+      collection[0]["CustomerName"].should == "ABC Corp"
+      collection[0]["Process"].should == "Finance"
+      collection[0]["NoticeCategory"].should == "Company News"
+      collection[0]["Comments"].should have(5).entries
+      collection[2]["Comments"].should have(3).entries
+      collection[2]["Comments"].should == [{"created_at"=>"4/30/2013 3:03:50 PM", "created_by"=>"Mark Greene", "comment_text"=>"This is a comment by a different user."}, {"created_at"=>"4/30/2013 3:02:31 PM", "created_by"=>"John Miller", "comment_text"=>"This is a \r test comment\r with line bresk 2"}, {"created_at"=>"4/30/2013 3:02:07 PM", "created_by"=>"John Miller", "comment_text"=>"This is a test comment 1"}]
     end
     
     it "loads a recordset from a crazy string representation using provided selector" do
