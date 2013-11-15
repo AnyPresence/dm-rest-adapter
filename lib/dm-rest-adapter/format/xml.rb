@@ -102,11 +102,6 @@ module DataMapper
         selector
       end
       
-      def build_array_selector(array_property_name)
-        DataMapper.logger.debug("Array selector is //#{singularize(array_property_name)}")
-        "//#{singularize(array_property_name)}/*"
-      end
-      
       def snake_case(camel) 
         if camel == "ID"
           "id"
