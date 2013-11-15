@@ -1,6 +1,5 @@
 class Atm
   include DataMapper::Resource
-
   # Include modules for extensions.
 
 
@@ -25,21 +24,21 @@ class Atm
 
   property :location, Object, field: "Location", key: false, required: false, lazy: false
 
-  property :parameter_city, Text, field: "City", key: false, required: false, lazy: false
+  property :parameter_city, Text, field: "City", key: false, required: false, lazy: false, fleeting: true
 
-  property :parameter_country, Text, field: "Country", key: false, required: false, lazy: false
+  property :parameter_country, Text, field: "Country", key: false, required: false, lazy: false, fleeting: true
 
-  property :parameter_country_subdivision, Text, field: "CountrySubdivision", key: false, required: false, lazy: false
+  property :parameter_country_subdivision, Text, field: "CountrySubdivision", key: false, required: false, lazy: false, fleeting: true
 
-  property :parameter_distance_unit, Text, field: "DistanceUnit", key: false, required: false, lazy: false
+  property :parameter_distance_unit, Text, field: "DistanceUnit", key: false, required: false, lazy: false, fleeting: true
 
-  property :parameter_latitude, Float, field: "Latitude", key: false, required: false, lazy: false
+  property :parameter_latitude, Float, field: "Latitude", key: false, required: false, lazy: false, fleeting: true
 
-  property :parameter_longitude, Float, field: "Longitude", key: false, required: false, lazy: false
+  property :parameter_longitude, Float, field: "Longitude", key: false, required: false, lazy: false, fleeting: true
 
-  property :parameter_postal_code, Text, field: "PostalCode", key: false, required: false, lazy: false
+  property :parameter_postal_code, Text, field: "PostalCode", key: false, required: false, lazy: false, fleeting: true
 
-  property :parameter_radius, Integer, field: "Radius", key: false, required: false, lazy: false
+  property :parameter_radius, Integer, field: "Radius", key: false, required: false, lazy: false, fleeting: true
 
   property :shared_deposit, Text, field: "SharedDeposit", key: false, required: false, lazy: false
 
