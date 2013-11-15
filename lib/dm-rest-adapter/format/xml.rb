@@ -146,9 +146,8 @@ module DataMapper
         end
         
         if array?(entity_element)
-          array = []
-          entity_element.element_children().each do |element|
-            array << walk_elements(element)
+          array = entity_element.element_children().collect do |element|
+            walk_elements(element)
           end
           DataMapper.logger.debug("Returning ARRAY of #{array.inspect}")
           array
@@ -158,12 +157,14 @@ module DataMapper
             hash.merge! walk_elements(element)
           end
           
-          if dm_property?(field) || dm_property?(pluralize(field)) # It is an actual property
+          if dm_property?(field) || dm_property?(pluralize(field)) 
+            # It is an actual property, so hand back the hash we made
             DataMapper.logger.debug("Returning HASH of #{hash.inspect}")
             hash
           else
             DataMapper.logger.debug("Setting #{field} to #{hash.inspect}")
-            { field => hash } # Tis a fleeting property
+            # Tis a fleeting property, and it needs a key
+            { field => hash } 
           end
         end
       end
