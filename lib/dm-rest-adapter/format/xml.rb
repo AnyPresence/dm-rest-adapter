@@ -29,9 +29,11 @@ module DataMapper
 
         selector = collection_selector_expression(model)
         
-        doc.xpath(selector).collect do |entity_element|
+        collection = doc.xpath(selector).collect do |entity_element|
           record_from_xml(entity_element)
         end
+        DataMapper.logger.debug("parse_collection is returning #{collection.inspect}")
+        collection
       end
       
       def parse_record(xml, model)
@@ -44,7 +46,9 @@ module DataMapper
         end
 
         @field_to_property = field_to_property_hash(model)
-        record_from_xml(entity_element)
+        record = record_from_xml(entity_element)
+        DataMapper.logger.debug("parse_record is returning #{record.inspect}")
+        record
       end
 
       private
@@ -68,10 +72,10 @@ module DataMapper
           end
           
           if property.instance_of? DataMapper::Property::Object
-            record[field] = walk_elements(element)
+            record[property.field] = walk_elements(element)
           else
             next unless property
-            record[field] = property.typecast(element.text)
+            record[property.field] = property.typecast(element.text)
           end
         end
         DataMapper.logger.debug("Record from XML is returning #{record.inspect}")
