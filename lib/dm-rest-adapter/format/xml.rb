@@ -74,7 +74,7 @@ module DataMapper
             record[field] = property.typecast(element.text)
           end
         end
-
+        DataMapper.logger.debug("Record from XML is returning #{record.inspect}")
         record
       end
 
@@ -150,8 +150,7 @@ module DataMapper
           entity_element.element_children().each do |element|
             array << walk_elements(element)
           end
-          DataMapper.logger.debug("Setting #{field} to array of #{array.inspect}")
-          { field => array }
+          DataMapper.logger.debug("Returning ARRAY of #{array.inspect}")
           array
         else
           hash = Hash.new
@@ -160,8 +159,10 @@ module DataMapper
           end
           
           if dm_property?(field) || dm_property?(pluralize(field)) # It is an actual property
+            DataMapper.logger.debug("Returning HASH of #{hash.inspect}")
             hash
           else
+            DataMapper.logger.debug("Setting #{field} to #{hash.inspect}")
             { field => hash } # Tis a fleeting property
           end
         end
