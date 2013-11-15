@@ -102,15 +102,6 @@ module DataMapper
         selector
       end
       
-      def parse_array(array_element,array_property_name)
-        return [] if array_element.nil?
-        array_selector = build_array_selector(array_property_name)
-        
-        array_element.xpath(array_selector).collect do |entity_element|
-          walk_elements(entity_element)
-        end
-      end
-      
       def build_array_selector(array_property_name)
         DataMapper.logger.debug("Array selector is //#{singularize(array_property_name)}")
         "//#{singularize(array_property_name)}/*"
