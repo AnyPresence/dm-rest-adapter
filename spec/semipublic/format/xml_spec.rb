@@ -6,6 +6,10 @@ describe DataMapper::Adapters::Format::Xml do
   
   it_should_behave_like "a Format"
   
+  before(:all) do
+    # DataMapper::Logger.new(STDOUT, :debug)
+  end
+  
   describe "#generate_payload" do
     before(:each) do
       @format = DataMapper::Adapters::Format::Xml.new
@@ -176,13 +180,13 @@ describe DataMapper::Adapters::Format::Xml do
       @format.collection_selector = nil
       collection = @format.parse_collection(NOTICES_XML_COLLECTION, Notice)
       collection.should have(5).entries
-      collection[0]["id"].should == 58
-      collection[0]["customer_name"].should == "ABC Corp"
-      collection[0]["process"].should == "Finance"
-      collection[0]["notice_category"].should == "Company News"
-      collection[0]["comments"].should have(5).entries
-      collection[2]["comments"].should have(3).entries
-      collection[2]["comments"].should == [{"created_at"=>"4/30/2013 3:03:50 PM", "created_by"=>"Mark Greene", "comment_text"=>"This is a comment by a different user."}, {"created_at"=>"4/30/2013 3:02:31 PM", "created_by"=>"John Miller", "comment_text"=>"This is a \r test comment\r with line bresk 2"}, {"created_at"=>"4/30/2013 3:02:07 PM", "created_by"=>"John Miller", "comment_text"=>"This is a test comment 1"}]
+      collection[0]["ID"].should == 58
+      collection[0]["CustomerName"].should == "ABC Corp"
+      collection[0]["Process"].should == "Finance"
+      collection[0]["NoticeCategory"].should == "Company News"
+      collection[0]["Comments"].should have(5).entries
+      collection[2]["Comments"].should have(3).entries
+      collection[2]["Comments"].should == [{"CreatedAt"=>"4/30/2013 3:03:50 PM", "CreatedBy"=>"Mark Greene", "CommentText"=>"This is a comment by a different user."}, {"CreatedAt"=>"4/30/2013 3:02:31 PM", "CreatedBy"=>"John Miller", "CommentText"=>"This is a \r test comment\r with line bresk 2"}, {"CreatedAt"=>"4/30/2013 3:02:07 PM", "CreatedBy"=>"John Miller", "CommentText"=>"This is a test comment 1"}]
     end
     
     it "loads a recordset from a crazy string representation using provided selector" do
@@ -283,4 +287,103 @@ describe DataMapper::Adapters::Format::Xml do
     end
 
   end
+  
+  describe "#parse crappy nested collection" do
+    before(:each) do
+      @format = DataMapper::Adapters::Format::Xml.new
+      @format.collection_selector = 'Atms.Atm'
+      @xml = DataMapper::Ext::String.compress_lines(<<-XML)
+      <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+        <Atms><PageOffset>0</PageOffset><TotalCount>2</TotalCount>
+          <Atm>
+            <Location>
+              <Name>157 ROCKAWAY CORP.</Name>
+              <Distance>0.00</Distance>
+              <DistanceUnit>mile</DistanceUnit>
+              <Address>
+                <Line1>15723 ROCKAWAY BLVD</Line1>
+                <City>JAMAICA</City>
+                <PostalCode>11434</PostalCode>
+                <CountrySubdivision>
+                  <Name></Name>
+                  <Code>NY</Code>
+                </CountrySubdivision>
+                <Country>
+                  <Name></Name>
+                  <Code>USA</Code>
+                </Country>
+              </Address>
+              <Point>
+                <Latitude>40.666256</Latitude>
+                <Longitude>-73.779289</Longitude>
+              </Point>
+            </Location>
+            <HandicapAccessible>NO</HandicapAccessible>
+            <Camera>NO</Camera>
+            <Availability>UNKNOWN</Availability>
+            <AccessFees>0</AccessFees>
+            <Owner>ATLAS ATM CORP</Owner>
+            <SharedDeposit>YES</SharedDeposit>
+            <SurchareFreeAlliance>NO</SurchareFreeAlliance>
+            <Sponsor>ATLAS ATM CORP</Sponsor>
+            <SupportEMV>0</SupportEMV>
+          </Atm>
+          <Atm>
+            <Location>
+              <Name>ABREU S MINI MART</Name>
+              <Distance>3.47</Distance>
+              <DistanceUnit>mile</DistanceUnit>
+              <Address>
+                <Line1>20219 JAMAICA AVE</Line1>
+                <City>HOLLIS</City>
+                <PostalCode>11423</PostalCode>
+                <CountrySubdivision>
+                  <Name></Name>
+                  <Code>NY</Code>
+                </CountrySubdivision>
+                <Country>
+                  <Name></Name>
+                  <Code>USA</Code>
+                </Country>
+              </Address>
+              <Point>
+                <Latitude>40.713606</Latitude>
+                <Longitude>-73.756899</Longitude>
+              </Point>
+            </Location>
+            <HandicapAccessible>NO</HandicapAccessible>
+            <Camera>NO</Camera>
+            <Availability>ALWAYS_AVAILABLE</Availability>
+            <AccessFees>0</AccessFees>
+            <Owner>CROWN ATM NETWORK, LLC</Owner>
+            <SharedDeposit>YES</SharedDeposit>
+            <SurchareFreeAlliance>NO</SurchareFreeAlliance>
+            <Sponsor>CROWN ATM NETWORK, LLC</Sponsor>
+            <SupportEMV>1</SupportEMV>
+          </Atm>
+        </Atms>
+      XML
+    end
+
+    it "loads an XML collection with a garbage hash" do
+      collection = @format.parse_collection(@xml, Atm)
+      collection.should have(2).entries
+      atm1 = collection.first
+
+      atm1["Owner"].should =="ATLAS ATM CORP"
+      atm1["AccessFees"].should == 0
+      atm1["Availability"].should == "UNKNOWN"
+      atm1["Camera"].should == "NO"
+      atm1["HandicapAccessible"].should == "NO"
+      atm1["SharedDeposit"].should == "YES"
+      atm1["Sponsor"].should == "ATLAS ATM CORP"
+      atm1["SupportEMV"].should == 0
+      atm1["Location"]["Address"]["Line1"].should == "15723 ROCKAWAY BLVD"
+      atm1["Location"]["Address"]["City"].should == "JAMAICA"
+      atm1["Location"]["Address"]["PostalCode"].should == "11434"
+      atm1["Location"]["Address"]["CountrySubdivision"]["Code"].should == "NY"
+      atm1["Location"]["Address"]["Country"]["Code"].should == "USA"
+    end
+  end
+
 end

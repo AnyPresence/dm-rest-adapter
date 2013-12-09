@@ -3,8 +3,9 @@ module DataMapper
     module Format
       
     class AbstractFormat
+      include DataMapper::Inflector
   	  attr_accessor :extension, :accept, :mime, :repository_name, :record_selector, :collection_selector
-
+      
       def initialize(options = {})
         options = default_options.merge(options)
         @extension = options[:extension]
@@ -66,11 +67,11 @@ module DataMapper
       end
       
       def element_name(model)
-        DataMapper::Inflector.singularize(resource_name(model))
+        singularize(resource_name(model))
       end
       
       def element_name_plural(model)
-        DataMapper::Inflector.pluralize(resource_name(model))
+        pluralize(resource_name(model))
       end
       
       def properties(model)
