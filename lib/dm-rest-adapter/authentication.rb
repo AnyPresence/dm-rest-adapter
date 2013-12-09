@@ -11,7 +11,7 @@ module DataMapperRest
 
         # Clean headers
         h = headers.clone
-        h[:params] = modify_query_param(h[:params].clone, options, [:order]) if !h[:params].empty?
+        h[:params] = modify_query_param(h[:params].clone, options, [:order]) if !h[:params].nil? && !h[:params].empty?
 
         # The RestClient request object must be constructed with a url that includes the query string
         query_string = extract_query_string(h[:params])
