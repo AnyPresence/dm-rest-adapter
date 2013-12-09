@@ -32,8 +32,11 @@ module DataMapper
 
       def prune_query_string(query)
         params = {}
-        query.each_pair do |k,v|
-            params[k] = v if v.is_a?(String) || v.is_a?(Symbol) || v.is_a?(Numeric)
+
+        if !query.nil? && !query.empty?
+          query.each_pair do |k,v|
+              params[k] = v if v.is_a?(String) || v.is_a?(Symbol) || v.is_a?(Numeric)
+          end
         end
         params
       end

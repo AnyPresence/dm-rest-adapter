@@ -11,18 +11,30 @@ module DataMapper
         @options = options
         private_key = cleanup_private_key(@options[:omniauth_ver_1_private_key])
         consumer_key = @options[:omniauth_ver_1_consumer_key] || ""
+        @callback = @options[:omniauth_ver_1_callback] || ""
+        @realm = @options[:realm]
         site = @options[:omniauth_ver_1_site] || ""
         @omniauth_ver_1_consumer = ::OAuth::Consumer.new(consumer_key.strip, private_key.strip, :site => site)
+        @log = DataMapper.logger
       end
       
-      def setup(req)
+      # Setups the oauth ver 1 headers for the request object
+      #
+      # Returns the request object
+      def setup(req, additional_options={})
         token_secret = @options[:omniauth_ver_1_token_secret] || ""
         token = @options[:omniauth_ver_1_token] || ""
         access_token = OAuth::ConsumerToken.from_hash(@omniauth_ver_1_consumer, {oauth_token_secret: token_secret, oauth_token: token})
         signature_method = @options[:omniauth_ver_1_signature_method] || "RSA-SHA1"
-        oauth_params = {:signature_method => signature_method, :token => access_token, :consumer => @omniauth_ver_1_consumer}      
+        oauth_params = {:signature_method => signature_method, :token => access_token, :consumer => @omniauth_ver_1_consumer}
+       
+        oauth_params.merge!({:oauth_callback => @callback}) if !@callback.nil? && !@callback.empty?
+        oauth_params.merge!({:realm => @realm}) if !@realm.nil? && !@realm.empty?
+        oauth_params.merge!(additional_options) if !additional_options.nil? && !additional_options.empty?
         oauth_helper = OAuth::Client::Helper.new(req, oauth_params.merge(:request_uri => req.url))
         # Add authorization header      
+        @log.debug("[OAUTH VER 1] HEADER: #{oauth_helper.header.inspect}")
+        @log.debug("[OAUTH VER 1] BASE SIGNATURE: #{oauth_helper.signature_base_string}")
         req.headers.merge!({"Authorization" => oauth_helper.header})
 
         req

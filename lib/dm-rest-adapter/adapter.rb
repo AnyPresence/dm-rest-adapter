@@ -15,26 +15,17 @@ module DataMapper
         path_items << { :model => mapped_name(model) }
 
         path = @format.resource_path(*path_items)
-        payload = @format.generate_payload(resource)
-        headers = create_headers(:content_type => @format.mime)
+        payload = @format.generate_payload(resource) if !@options[:ignore_payload]
+
+        target = @rest_client[path]
+
+        headers = ::DataMapperRest::Authentication.setup_auth(@rest_client, path, @options, create_headers(:content_type => @format.mime), :post)
         
         @log.debug("About to POST to #{path} with:\nHeaders #{headers}\nData: #{payload}")
-        
-        response = @rest_client[path].post(
-          payload,
-          headers
-        ) do |response, request, result, &block|
-          
-          # See http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.2 for HTTP response 201
-          if @options[:follow_on_create] && [201, 301, 302, 307].include?(response.code)
-            response.args[:method] = :get
-            response.args.delete(:payload)
-            response.follow_redirection(request, result, &block)
-          else
-            response.return!(request, result, &block)
-          end
-        end
-        
+
+        req = ::RestClient::Request.new(url: target.url, method: :post, headers: {})
+        headers.delete(:params) if !headers.nil? && headers[:params].empty?
+        response = target.post(payload, headers)
         response_body = response.body
         @log.debug("Response to POST was #{response.code} #{response_body}")
         
@@ -54,6 +45,8 @@ module DataMapper
         begin
           path_items << { :model => mapped_name(model) , :key => id }
           path = @format.resource_path(*path_items)
+
+
           
           @log.debug("About to GET using #{path}")
           target = @rest_client[path]
