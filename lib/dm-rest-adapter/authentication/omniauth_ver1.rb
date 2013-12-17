@@ -6,7 +6,7 @@ module DataMapper
   module Authentication
     class OmniauthVer1 < DataMapperRest::Authentication::Base
       attr_reader :options
-      
+
       def initialize(options)
         @options = options
         private_key = cleanup_private_key(@options[:omniauth_ver_1_private_key])
@@ -17,35 +17,48 @@ module DataMapper
         @omniauth_ver_1_consumer = ::OAuth::Consumer.new(consumer_key.strip, private_key.strip, :site => site)
         @log = DataMapper.logger
       end
-      
+
       # Setups the oauth ver 1 headers for the request object
       #
       # Returns the request object
-      def setup(req, additional_options={})
+      def setup(req, options={})
+        req.headers.merge! generate_header(req, req.url, options)
+        req
+      end
+
+      # Generates the authorization header
+      #
+      # Returns the header
+      def generate_header(req, request_uri, options={})
+        headers = {}
         token_secret = @options[:omniauth_ver_1_token_secret] || ""
         token = @options[:omniauth_ver_1_token] || ""
         access_token = OAuth::ConsumerToken.from_hash(@omniauth_ver_1_consumer, {oauth_token_secret: token_secret, oauth_token: token})
         signature_method = @options[:omniauth_ver_1_signature_method] || "RSA-SHA1"
         oauth_params = {:signature_method => signature_method, :token => access_token, :consumer => @omniauth_ver_1_consumer}
-       
+
         oauth_params.merge!({:oauth_callback => @callback}) if !@callback.nil? && !@callback.empty?
         oauth_params.merge!({:realm => @realm}) if !@realm.nil? && !@realm.empty?
-        oauth_params.merge!(additional_options) if !additional_options.nil? && !additional_options.empty?
-        oauth_helper = OAuth::Client::Helper.new(req, oauth_params.merge(:request_uri => req.url))
-        # Add authorization header      
+        oauth_params.merge!(options[:extra_headers]) if !options[:extra_headers].nil? && !options[:extra_headers].empty?
+        oauth_helper = OAuth::Client::Helper.new(req, oauth_params.merge(:request_uri => request_uri))
+        # Hash the body if specified
+        oauth_helper.hash_body if options[:hash_body]
+        # Add authorization header
         @log.debug("[OAUTH VER 1] HEADER: #{oauth_helper.header.inspect}")
         @log.debug("[OAUTH VER 1] BASE SIGNATURE: #{oauth_helper.signature_base_string}")
-        req.headers.merge!({"Authorization" => oauth_helper.header})
+        headers["Authorization"] = oauth_helper.header
 
-        req
+        headers
       end
-      
+
+
+
       private
-      
+
       def cleanup_private_key(private_key)
         private_key.gsub("\\n", "\n").gsub("\"", "")
       end
-      
+
     end
   end
 end
