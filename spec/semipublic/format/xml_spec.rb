@@ -384,6 +384,15 @@ describe DataMapper::Adapters::Format::Xml do
       atm1["Location"]["Address"]["CountrySubdivision"]["Code"].should == "NY"
       atm1["Location"]["Address"]["Country"]["Code"].should == "USA"
     end
+    
+    it "loads an XML collection from an actual response" do
+      collection = @format.parse_collection(ATMS_XML_COLLECTION, Atm)
+      collection.should have(25).entries
+      atm = collection.first
+      atm["Location"]["Address"]["Line1"].should == '1440 INDIANAPOLIS BLVD'
+      atm["Location"]["Address"]["CountrySubdivision"]["Name"].should == ''
+      atm["Location"]["Address"]["CountrySubdivision"]["Code"].should == 'IN'
+    end
   end
 
 end

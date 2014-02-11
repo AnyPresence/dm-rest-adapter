@@ -9680,3 +9680,6 @@ DNBDIRECT_JSON_COLLECTION = <<-JSON
     }
 }
 JSON
+
+atms_file = File.open("#{Dir.pwd}/spec/Atms.xml", "rb")
+ATMS_XML_COLLECTION = DataMapper::Ext::String.compress_lines( atms_file.read )
