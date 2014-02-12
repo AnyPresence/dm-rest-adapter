@@ -797,6 +797,26 @@ describe DataMapper::Adapters::RestAdapter do
     end
   end
   
+  describe "deeply nested resource paths with fleeting properties" do
+    before(:each) do
+      @adapter.format = DataMapper::Adapters::Format::Xml.new(collection_selector: 'Atms.Atm')
+      
+      @response.should_receive(:body).twice.and_return(ATMS_XML_COLLECTION)
+      @response.should_receive(:code).once.and_return(200)
+      
+      @adapter.rest_client.should_receive(:[]).and_return(@adapter.rest_client)
+      @adapter.rest_client.should_receive(:get).with({:accept=>"application/xml", :api_key=>"HumptyDumpty", :params=>{:order=>{:Owner=>:asc}}}).and_return(@response)
+      
+    end
+    
+    it "should walk the object tree and parse all embedded stuff" do
+      atms = Atm.all
+      atms.size.should == 25
+      atm = atms.first
+      atm.location["Address"]["CountrySubdivision"]["Code"].should == 'IN'
+    end
+  end
+  
   describe "authenticate using omniauth version 1" do
     
     before(:each) do
