@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Scott Burton @ Joyent Inc"]
-  s.date = "2012-12-04"
+  s.date = "2014-03-25"
   s.description = "REST Adapter for DataMapper"
   s.email = "scott.burton [a] joyent [d] com"
   s.extra_rdoc_files = [
@@ -25,18 +25,30 @@ Gem::Specification.new do |s|
     "dm-rest-adapter.gemspec",
     "lib/dm-rest-adapter.rb",
     "lib/dm-rest-adapter/adapter.rb",
-    "lib/dm-rest-adapter/exceptions.rb",
+    "lib/dm-rest-adapter/authentication.rb",
     "lib/dm-rest-adapter/authentication/omniauth_ver1.rb",
-    "lib/dm-rest-adapter/helper/query_param.rb",
+    "lib/dm-rest-adapter/exceptions.rb",
     "lib/dm-rest-adapter/format.rb",
     "lib/dm-rest-adapter/format/json.rb",
     "lib/dm-rest-adapter/format/xml.rb",
+    "lib/dm-rest-adapter/helper/query_param.rb",
     "lib/dm-rest-adapter/spec/setup.rb",
+    "spec/Notices.xml",
+    "spec/fixtures/article.rb",
     "spec/fixtures/book.rb",
     "spec/fixtures/book_cover.rb",
     "spec/fixtures/chapter.rb",
+    "spec/fixtures/comment.rb",
+    "spec/fixtures/company.rb",
     "spec/fixtures/difficult_book.rb",
+    "spec/fixtures/fake_private_key.rb",
+    "spec/fixtures/forecast_day.rb",
+    "spec/fixtures/message.rb",
+    "spec/fixtures/notice.rb",
     "spec/fixtures/publisher.rb",
+    "spec/fixtures/store.rb",
+    "spec/fixtures/test_data.rb",
+    "spec/fixtures/tweet.rb",
     "spec/fixtures/vendor.rb",
     "spec/rcov.opts",
     "spec/semipublic/format/json_spec.rb",
@@ -52,26 +64,28 @@ Gem::Specification.new do |s|
   s.homepage = "http://github.com/datamapper/dm-rest-adapter"
   s.require_paths = ["lib"]
   s.rubyforge_project = "datamapper"
-  s.rubygems_version = "1.8.24"
+  s.rubygems_version = "2.0.14"
   s.summary = "REST Adapter for DataMapper"
 
   if s.respond_to? :specification_version then
-    s.specification_version = 3
+    s.specification_version = 4
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<dm-serializer>, ["~> 1.2.0"])
       s.add_runtime_dependency(%q<multi_json>, ["~> 1.8"])
       s.add_runtime_dependency(%q<json>, ["~> 1.8"])
       s.add_runtime_dependency(%q<json_pure>, ["~> 1.8"])
+      s.add_runtime_dependency(%q<jsonpath>, ["~> 0.5.4"])
       s.add_development_dependency(%q<dm-validations>, ["~> 1.2.0"])
       s.add_development_dependency(%q<jeweler>, ["~> 1.8.4"])
       s.add_development_dependency(%q<rake>, ["~> 0.9.2"])
-      s.add_development_dependency(%q<rspec>, ["~> 1.3.2"])        
+      s.add_development_dependency(%q<rspec>, ["~> 1.3.2"])
     else
       s.add_dependency(%q<dm-serializer>, ["~> 1.2.0"])
       s.add_dependency(%q<multi_json>, ["~> 1.8"])
       s.add_dependency(%q<json>, ["~> 1.8"])
       s.add_dependency(%q<json_pure>, ["~> 1.8"])
+      s.add_dependency(%q<jsonpath>, ["~> 0.5.4"])
       s.add_dependency(%q<dm-validations>, ["~> 1.2.0"])
       s.add_dependency(%q<jeweler>, ["~> 1.8.4"])
       s.add_dependency(%q<rake>, ["~> 0.9.2"])
@@ -82,6 +96,7 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<multi_json>, ["~> 1.8"])
     s.add_dependency(%q<json>, ["~> 1.8"])
     s.add_dependency(%q<json_pure>, ["~> 1.8"])
+    s.add_dependency(%q<jsonpath>, ["~> 0.5.4"])
     s.add_dependency(%q<dm-validations>, ["~> 1.2.0"])
     s.add_dependency(%q<jeweler>, ["~> 1.8.4"])
     s.add_dependency(%q<rake>, ["~> 0.9.2"])
